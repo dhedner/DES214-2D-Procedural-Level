@@ -116,7 +116,10 @@ func build_graph():
 	
 	# Prim's
 	path = AStar2D.new()
-	add_to_graph(path, rooms.pop_front())
+	add_to_graph(path, start_room)
+	rooms.erase(start_room)
+	
+	var max_degree = 1
 	
 	# Repeat until no more nodes remain
 	while rooms:
@@ -126,17 +129,26 @@ func build_graph():
 		
 		# Loop through all points in the path
 		for p1 in path.get_point_ids():
-			var p3
-			p3 = path.get_point_position(p1)
+			var p1_room = graph_id_to_room[p1]
+			if (p1_room.is_start or p1_room.is_end) and p1_room.corridor_count >= max_degree:
+				continue
+					
+			var p1_position = path.get_point_position(p1)
 			#loop though the remaining nodes
 			for p2_room in rooms:
-				var dist = p3.distance_to(p2_room.position)
+				if (p2_room.is_start or p2_room.is_end) and p2_room.corridor_count >= max_degree:
+					continue
+
+				var dist = p1_position.distance_to(p2_room.position)
 				if dist < min_distance:
 					min_distance = dist
 					min_position_room = p2_room
-					current_position = p3
-		var neighbor = add_to_graph(path, min_position_room)
-		path.connect_points(path.get_closest_point(current_position), neighbor)
+					current_position = p1_position
+		var source_id = path.get_closest_point(current_position)
+		var destination_id = add_to_graph(path, min_position_room)
+		path.connect_points(source_id, destination_id)
+		graph_id_to_room[source_id].corridor_count += 1
+		min_position_room.corridor_count += 1
 		rooms.erase(min_position_room)
 
 func generate_tiles():
