@@ -13,7 +13,7 @@ var player = preload("res://assets/scenes/player.tscn")
 @export var y_bias = 300
 #@export var cull_percentage = 0.2
 
-var path # Graph that contains all the rooms and their corridors
+var path : AStar2D # Graph that contains all the rooms and their corridors
 var graph_id_to_room
 var shortest_path_astar = AStar2D.new() # AStar for shortest path
 var player_spawn = null
@@ -78,27 +78,34 @@ func make_rooms():
 		$Rooms.add_child(current_room)
 	# Wait for rooms to settle via physics engine
 	await get_tree().create_timer(1.1).timeout
-	# Remove a portion of the rooms
-	var usable_room_positions = []
 	
+	var full_map = Rect2()
 	for room in $Rooms.get_children():
 		room.freeze = true;
+		var rectangle = Rect2(
+			room.position - room.size, 
+			room.get_node("CollisionShape2D").shape.extents * 2)
+		full_map = full_map.merge(rectangle)
 	
 	find_start_and_end_rooms()
 	
 	# Generate a minimum spanning tree
 	build_graph()
-	
-	for point in path.get_point_ids():
-		for connection in path.get_point_connections(point):
-			var pp = path.get_point_position(point)
-			var cp = path.get_point_position(connection)
-			# instantiate a path
-			var current_corridor = corridor.instantiate()
-			current_corridor.make_corridor(pp, cp)
-			$Corridors.add_child(current_corridor)
-			
+	create_corridors_from_graph()
 	find_main_path()
+	
+	check_room_distribution(full_map)
+
+func check_room_distribution(map_size):
+	if ((map_size.size.x / 2) > map_size.size.y) or ((map_size.size.y / 2) > map_size.size.x):
+		print("Undesirable map size: ", map_size.size)
+		clear_map()
+		for r in $Rooms.get_children():
+			r.queue_free()
+		await get_tree().process_frame
+		path = null
+		make_rooms()
+
 
 func add_to_graph(graph, room):
 	var id = graph.get_available_point_id()
@@ -114,7 +121,6 @@ func build_graph():
 
 	graph_id_to_room = Dictionary()
 	
-	# Prim's
 	path = AStar2D.new()
 	add_to_graph(path, start_room)
 	rooms.erase(start_room)
@@ -150,6 +156,21 @@ func build_graph():
 		graph_id_to_room[source_id].corridor_count += 1
 		min_position_room.corridor_count += 1
 		rooms.erase(min_position_room)
+
+func create_corridors_from_graph():
+	for point in path.get_point_ids():
+		for connection in path.get_point_connections(point):
+			var pp = path.get_point_position(point)
+			var cp = path.get_point_position(connection)
+			# instantiate a path
+			var current_corridor = corridor.instantiate()
+			current_corridor.make_corridor(pp, cp)
+			$Corridors.add_child(current_corridor)
+			
+			var current_room = graph_id_to_room[connection]
+			
+			if current_room.is_end:
+				current_corridor.locked = true
 
 func generate_tiles():
 	map.clear()
@@ -249,36 +270,5 @@ func find_main_path():
 	
 	var i = 0
 	for id in path_from_start_to_end:
-		graph_id_to_room[id].index = i
+		graph_id_to_room[id].main_path_index = i
 		i += 1
-	
-	#var graph = {}
-	#var start_room = null
-	#var end_room = null
-	#
-	#for room in $Rooms.get_children():
-		#if room.is_start:
-			#start_room = room
-		#if room.is_end:
-			#end_room = room
-		#shortest_path_astar.add_point(room.get_instance_id(), room.position)
-#
-	#for room in $Rooms.get_children():
-		#for other_room in $Rooms.get_children():
-			#if room != other_room and room.position.distance_to(other_room.position) <= (tile_size * max_size):
-				#shortest_path_astar.connect_points(room.get_instance_id(), other_room.get_instance_id(), false)
-#
-	#var path_points = shortest_path_astar.get_id_path(start_room.get_instance_id(), end_room.get_instance_id())
-	#assign_indices_to_path(path_points)
-#
-#func assign_indices_to_path(path_points):
-	#for i in range(path_points.size()):
-		#var room_id = path_points[i]
-		#var room = instance_from_id(room_id)
-		#room.index = i + 1
-		#room.is_on_main_path = true
-	#
-	#for room in $Rooms.get_children():
-		#if room.get_instance_id() not in path_points:
-			#room.index = -1
-			#room.is_on_main_path = false
