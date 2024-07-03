@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://cha8w0vfkicu8"]
+
+[ext_resource type="Script" path="res://assets/scripts/enemyAI.gd" id="1_smpxb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_coc5g"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2qne8"]
+
+[node name="Enemy" type="CharacterBody2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_coc5g")
+
+[node name="AI" type="Node2D" parent="."]
+script = ExtResource("1_smpxb")
+
+[node name="PlayerDetectionZone" type="Area2D" parent="AI"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AI/PlayerDetectionZone"]
+shape = SubResource("CircleShape2D_2qne8")
