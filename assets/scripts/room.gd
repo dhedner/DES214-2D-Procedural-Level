@@ -6,6 +6,7 @@ var size
 var is_start = false
 var is_end = false
 var index = 1
+var graph_id
 var is_on_main_path = false
 
 func make_room(_position, _size):

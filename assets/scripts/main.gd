@@ -13,18 +13,17 @@ var player = preload("res://assets/scenes/player.tscn")
 @export var y_bias = 300
 #@export var cull_percentage = 0.2
 
-var path # AStar for spanning tree
+var path # Graph that contains all the rooms and their corridors
+var graph_id_to_room
 var shortest_path_astar = AStar2D.new() # AStar for shortest path
 var player_spawn = null
 var debug_mode = true
-
-var start_room_id
-var end_room_id
+var start_room = null
+var end_room = null
 
 func _ready():
 	randomize()
 	await make_rooms()
-	find_main_path()
 
 func _draw():
 	if !debug_mode:
@@ -41,6 +40,7 @@ func _input(event):
 			$Camera2D.enabled = true
 		for r in $Rooms.get_children():
 			r.queue_free()
+		await get_tree().process_frame
 		path = null
 		make_rooms()
 	
@@ -80,27 +80,14 @@ func make_rooms():
 	await get_tree().create_timer(1.1).timeout
 	# Remove a portion of the rooms
 	var usable_room_positions = []
-	#for room in $Rooms.get_children():
-		#if randf() < cull:
-			#room.queue_free()
-		#else:
-			#room.freeze = true;
-			#usable_room_positions.append(room.position)
 	
-	var all_rooms = []
 	for room in $Rooms.get_children():
 		room.freeze = true;
-		all_rooms.append(room.position)
-	
-	#usable_room_positions = cull_rooms(all_rooms, cull_percentage)
-	
-	# TODO: await 1 frame so culled rooms get deleted
 	
 	find_start_and_end_rooms()
 	
 	# Generate a minimum spanning tree
-	#path = find_mst(usable_room_positions)
-	path = find_mst(all_rooms)
+	build_graph()
 	
 	for point in path.get_point_ids():
 		for connection in path.get_point_connections(point):
@@ -110,54 +97,31 @@ func make_rooms():
 			var current_corridor = corridor.instantiate()
 			current_corridor.make_corridor(pp, cp)
 			$Corridors.add_child(current_corridor)
-	
+			
+	find_main_path()
 
-# Cull a portion of the rooms and return the positions of the rooms left over
-#func cull_rooms(rooms, percentage):
-	#var full_rect = Rect2()
-	#for room in rooms:
-		#var rectangle = Rect2(
-			#room.position - room.size, 
-			#room.get_node("CollisionShape2D").shape.extents * 2)
-		#full_rect = full_rect.merge(rectangle)
-	#var center = Vector2(full_rect.size.x / 2, full_rect.size.y / 2)
-	#var room_distances = calculated_room_distance(rooms, center)
-	#room_distances.sort_custom(self, "distances")
-	#
-	#var num_to_cull = int(rooms.size() * percentage)
-	#for i in range(num_to_cull):
-		#rooms[room_distances[i]["room"].index].queue_free()
-	#
-	#var leftover_rooms = []
-	#for room in rooms:
-		#leftover_rooms.append(room.position)
-	#
-	#return leftover_rooms
+func add_to_graph(graph, room):
+	var id = graph.get_available_point_id()
+	graph_id_to_room[id] = room
+	graph.add_point(id, room.position)
+	room.graph_id = id
+	return id
 
-#func calculated_room_distance(rooms, center):
-	#var distances = []
-	#for room in rooms:
-		#var distance = room.position.distance_to(center)
-		#distances.append({
-			#"room": room,
-			#"distance": distance
-		#})
-	#return distances
+func build_graph():
+	var rooms = []
+	for room in $Rooms.get_children():
+		rooms.append(room)
 
-func find_mst(nodes):
-	#var rooms = []
-	#for room in $Rooms.get_children():
-		#if not room.is_queued_for_deletion():
-			#rooms.append(room)
+	graph_id_to_room = Dictionary()
 	
 	# Prim's
-	var path = AStar2D.new()	
-	path.add_point(path.get_available_point_id(), nodes.pop_front())
+	path = AStar2D.new()
+	add_to_graph(path, rooms.pop_front())
 	
 	# Repeat until no more nodes remain
-	while nodes:
+	while rooms:
 		var min_distance = INF # Minimum distance so far
-		var min_position = null # Position of the node
+		var min_position_room = null
 		var current_position = null
 		
 		# Loop through all points in the path
@@ -165,16 +129,15 @@ func find_mst(nodes):
 			var p3
 			p3 = path.get_point_position(p1)
 			#loop though the remaining nodes
-			for p2 in nodes:
-				if p3.distance_to(p2) < min_distance:
-					min_distance = p3.distance_to(p2)
-					min_position = p2
+			for p2_room in rooms:
+				var dist = p3.distance_to(p2_room.position)
+				if dist < min_distance:
+					min_distance = dist
+					min_position_room = p2_room
 					current_position = p3
-		var neighbor = path.get_available_point_id()
-		path.add_point(neighbor, min_position)
+		var neighbor = add_to_graph(path, min_position_room)
 		path.connect_points(path.get_closest_point(current_position), neighbor)
-		nodes.erase(min_position)
-	return path
+		rooms.erase(min_position_room)
 
 func generate_tiles():
 	map.clear()
@@ -249,8 +212,6 @@ func carve_path(start, end):
 func find_start_and_end_rooms():
 	var min_axis = INF
 	var max_axis = -INF
-	var start_room = null
-	var end_room = null
 	for room in $Rooms.get_children():
 		if room.is_queued_for_deletion():
 			continue
@@ -272,41 +233,40 @@ func find_start_and_end_rooms():
 	end_room.is_end = true
 
 func find_main_path():
-	var g = AStar2D.new()
-	#g.
-	# Traverse all nodes in path
-	# Find the node positions that match the start and end rooms
-	# To get their IDs -> the IDs that are assigned by A*
-	# Given those IDs, you can call this line
-	# var path_from_start_to_end = path.get_id_path(start_room_id, end_room_id)
+	var path_from_start_to_end = path.get_id_path(start_room.graph_id, end_room.graph_id)
 	
-	var graph = {}
-	var start_room = null
-	var end_room = null
+	var i = 0
+	for id in path_from_start_to_end:
+		graph_id_to_room[id].index = i
+		i += 1
 	
-	for room in $Rooms.get_children():
-		if room.is_start:
-			start_room = room
-		if room.is_end:
-			end_room = room
-		shortest_path_astar.add_point(room.get_instance_id(), room.position)
-
-	for room in $Rooms.get_children():
-		for other_room in $Rooms.get_children():
-			if room != other_room and room.position.distance_to(other_room.position) <= (tile_size * max_size):
-				shortest_path_astar.connect_points(room.get_instance_id(), other_room.get_instance_id(), false)
-
-	var path_points = shortest_path_astar.get_id_path(start_room.get_instance_id(), end_room.get_instance_id())
-	assign_indices_to_path(path_points)
-
-func assign_indices_to_path(path_points):
-	for i in range(path_points.size()):
-		var room_id = path_points[i]
-		var room = instance_from_id(room_id)
-		room.index = i + 1
-		room.is_on_main_path = true
-	
-	for room in $Rooms.get_children():
-		if room.get_instance_id() not in path_points:
-			room.index = -1
-			room.is_on_main_path = false
+	#var graph = {}
+	#var start_room = null
+	#var end_room = null
+	#
+	#for room in $Rooms.get_children():
+		#if room.is_start:
+			#start_room = room
+		#if room.is_end:
+			#end_room = room
+		#shortest_path_astar.add_point(room.get_instance_id(), room.position)
+#
+	#for room in $Rooms.get_children():
+		#for other_room in $Rooms.get_children():
+			#if room != other_room and room.position.distance_to(other_room.position) <= (tile_size * max_size):
+				#shortest_path_astar.connect_points(room.get_instance_id(), other_room.get_instance_id(), false)
+#
+	#var path_points = shortest_path_astar.get_id_path(start_room.get_instance_id(), end_room.get_instance_id())
+	#assign_indices_to_path(path_points)
+#
+#func assign_indices_to_path(path_points):
+	#for i in range(path_points.size()):
+		#var room_id = path_points[i]
+		#var room = instance_from_id(room_id)
+		#room.index = i + 1
+		#room.is_on_main_path = true
+	#
+	#for room in $Rooms.get_children():
+		#if room.get_instance_id() not in path_points:
+			#room.index = -1
+			#room.is_on_main_path = false
