@@ -6,12 +6,12 @@ var player = preload("res://assets/scenes/player.tscn")
 @onready var map = $TileMap
 
 @export var tile_size = 32
-@export var num_rooms = 15
+@export var num_rooms = 20
 @export var min_size = 5
 @export var max_size = 9
 @export var x_bias = 100
 @export var y_bias = 300
-#@export var cull_percentage = 0.2
+@export var path_cycles = 1
 
 var path : AStar2D # Graph that contains all the rooms and their corridors
 var graph_id_to_room
@@ -48,9 +48,9 @@ func _input(event):
 		generate_tiles()
 	
 	if event.is_action_pressed("ui_cancel"):
-		#player_spawn = player.instantiate()
-		#add_child(player_spawn)
-		#player_spawn.position = start_room.position
+		player_spawn = player.instantiate()
+		add_child(player_spawn)
+		player_spawn.position = start_room.position
 		debug_mode = false
 		$Camera2D.enabled = false
 
@@ -93,6 +93,7 @@ func make_rooms():
 	build_graph()
 	create_corridors_from_graph()
 	find_main_path()
+	create_cycles()
 	
 	check_room_distribution(full_map)
 
@@ -106,6 +107,75 @@ func check_room_distribution(map_size):
 		path = null
 		make_rooms()
 
+func generate_tiles():
+	map.clear()
+
+	# Fill entire map with wall tiles
+	var full_rect = Rect2()
+	for room in $Rooms.get_children():
+		var rectangle = Rect2(
+			room.position - room.size, 
+			room.get_node("CollisionShape2D").shape.extents * 2)
+		full_rect = full_rect.merge(rectangle)
+		
+	var top_left = map.local_to_map(full_rect.position)
+	var bottom_right = map.local_to_map(full_rect.end)
+	for x in range (top_left.x, bottom_right.x):
+		for y in range (top_left.y, bottom_right.y):
+			map.set_cell(0, Vector2i(x, y), 1, Vector2i(1, 1), 0)
+		
+	# Carve out rooms
+	var corridors = [] # One corridor per connection
+	
+	for room in $Rooms.get_children():
+		var size = (room.size / tile_size).floor()
+		var position = map.local_to_map(room.position)
+		var room_top_left = (room.position / tile_size).floor() - size
+		for x in range(2, size.x * 2 - 1):
+			for y in range(2, size.y * 2 - 1):
+				map.set_cell(
+				0, 
+				Vector2i(room_top_left.x + x, 
+				room_top_left.y + y), 
+				1, 
+				Vector2i(0, 3), 0)
+		var current_path = path.get_closest_point(room.position)
+		for connection in path.get_point_connections(current_path):
+			if not connection in corridors:
+				var starting_point = map.local_to_map(Vector2(
+					path.get_point_position(current_path).x, 
+					path.get_point_position(current_path).y))
+				var ending_point = map.local_to_map(Vector2(
+					path.get_point_position(connection).x, 
+					path.get_point_position(connection).y))
+				carve_path(starting_point, ending_point)
+			corridors.append(current_path)
+
+func carve_path(start, end):
+	# Carve a path between two points
+	var difference_x = sign(end.x - start.x)
+	var difference_y = sign(end.y - start.y)
+	
+	if difference_x == 0:
+		difference_x = pow(-1.0, randi() % 2)
+	if difference_y == 0:
+		difference_y = pow(-1.0, randi() % 2)
+	
+	# Choose either x/y or x/y
+	var x_over_y = start
+	var y_over_x = end
+	
+	if randi() % 2 > 0:
+		x_over_y = end
+		y_over_x = start
+
+	for x in range(start.x, end.x, difference_x):
+		# Make corridors 2-tiles wide
+		map.set_cell(0, Vector2i(x, x_over_y.y), 1, Vector2i(0, 3), 0);
+		map.set_cell(0, Vector2i(x, x_over_y.y + difference_y), 1, Vector2i(0, 3), 0);
+	for y in range(start.y, end.y, difference_y):
+		map.set_cell(0, Vector2i(y_over_x.x, y), 1, Vector2i(0, 3), 0);
+		map.set_cell(0, Vector2i(y_over_x.x + difference_x, y), 1, Vector2i(0, 3), 0);
 
 func add_to_graph(graph, room):
 	var id = graph.get_available_point_id()
@@ -172,76 +242,6 @@ func create_corridors_from_graph():
 			if current_room.is_end:
 				current_corridor.locked = true
 
-func generate_tiles():
-	map.clear()
-
-	# Fill entire map with wall tiles
-	var full_rect = Rect2()
-	for room in $Rooms.get_children():
-		var rectangle = Rect2(
-			room.position - room.size, 
-			room.get_node("CollisionShape2D").shape.extents * 2)
-		full_rect = full_rect.merge(rectangle)
-		
-	var top_left = map.local_to_map(full_rect.position)
-	var bottom_right = map.local_to_map(full_rect.end)
-	for x in range (top_left.x, bottom_right.x):
-		for y in range (top_left.y, bottom_right.y):
-			map.set_cell(0, Vector2i(x, y), 1, Vector2i(1, 1), 0)
-		
-	# Carve out rooms
-	var corridors = [] # One corridor per connection
-	
-	for room in $Rooms.get_children():
-		var size = (room.size / tile_size).floor()
-		var position = map.local_to_map(room.position)
-		var room_top_left = (room.position / tile_size).floor() - size
-		for x in range(2, size.x * 2 - 1):
-			for y in range(2, size.y * 2 - 1):
-				map.set_cell(
-				0, 
-				Vector2i(room_top_left.x + x, 
-				room_top_left.y + y), 
-				1, 
-				Vector2i(0, 3), 0)
-		var current_path = path.get_closest_point(room.position)
-		for connection in path.get_point_connections(current_path):
-			if not connection in corridors:
-				var starting_point = map.local_to_map(Vector2(
-					path.get_point_position(current_path).x, 
-					path.get_point_position(current_path).y))
-				var ending_point = map.local_to_map(Vector2(
-					path.get_point_position(connection).x, 
-					path.get_point_position(connection).y))
-				carve_path(starting_point, ending_point)
-			corridors.append(current_path)
-			
-func carve_path(start, end):
-	# Carve a path between two points
-	var difference_x = sign(end.x - start.x)
-	var difference_y = sign(end.y - start.y)
-	
-	if difference_x == 0:
-		difference_x = pow(-1.0, randi() % 2)
-	if difference_y == 0:
-		difference_y = pow(-1.0, randi() % 2)
-	
-	# Choose either x/y or x/y
-	var x_over_y = start
-	var y_over_x = end
-	
-	if randi() % 2 > 0:
-		x_over_y = end
-		y_over_x = start
-
-	for x in range(start.x, end.x, difference_x):
-		# Make corridors 2-tiles wide
-		map.set_cell(0, Vector2i(x, x_over_y.y), 1, Vector2i(0, 3), 0);
-		map.set_cell(0, Vector2i(x, x_over_y.y + difference_y), 1, Vector2i(0, 3), 0);
-	for y in range(start.y, end.y, difference_y):
-		map.set_cell(0, Vector2i(y_over_x.x, y), 1, Vector2i(0, 3), 0);
-		map.set_cell(0, Vector2i(y_over_x.x + difference_x, y), 1, Vector2i(0, 3), 0);
-
 func find_start_and_end_rooms():
 	var min_axis = INF
 	var max_axis = -INF
@@ -272,3 +272,134 @@ func find_main_path():
 	for id in path_from_start_to_end:
 		graph_id_to_room[id].main_path_index = i
 		i += 1
+
+func create_cycles():
+	if path_cycles <= 0:
+		return
+	
+	var leaf_nodes = []
+	var graph_connections = {}
+	
+	# Find dead ends (leaves) and create map of connections
+	for room in $Rooms.get_children():
+		var connections = path.get_point_connections(room.graph_id)
+		graph_connections[room.graph_id] = connections
+		# Find all dead ends (not including start/end rooms)
+		if connections.size() == 1 and not room.is_start and not room.is_end:
+			leaf_nodes.append(room)
+	
+	var leaf_pairs = find_leaf_pairs(leaf_nodes, graph_connections)
+	if leaf_pairs.is_empty():
+		return
+	
+	# Sort pairs by physical distance
+	#leaf_pairs.sort_custom(LeafPairComparator)
+	#
+	#var cycles_created = 0
+	#for pair in leaf_pairs:
+		#if cycles_created >= path_cycles:
+			#break
+		#var node_a = pair[0]
+		#var node_b = pair[1]
+		#if not path.are_points_connected(node_a.graph_id, node_b.graph_id):
+			#path.connect_points(node_a.graph_id, node_b.graph_id, false)
+			#create_corridor(node_a.position, node_b.position)
+			#cycles_created += 1
+			#print("Cycle created between: ", node_a, " and ", node_b)
+	
+	# Create cycles based on defined constraint
+	var cycles_created = 0
+	while cycles_created < path_cycles:
+		#var leaf_pairs = find_leaf_pairs(leaf_nodes, graph_connections)
+		var closest_pair = null
+		var min_physical_distance = INF
+		if leaf_pairs.is_empty():
+			return
+		else:
+			#for leaf in leaf_nodes:
+				#if leaf.is_on_main_path or leaf.is_start or leaf.is_end:
+					#continue
+				#for main_path_id in path.get_point_ids():
+					#var main_room = graph_id_to_room[main_path_id]
+					#if main_room.main_path_index > 0:
+						#path.connect_points(leaf.graph_id, main_room.graph_id, false)
+						#create_corridor(leaf.position, main_room.position)
+						#cycles_created += 1
+						#print("Fallback cycle created between leaf: ", leaf, " and main path node: ", main_room)
+						#return
+			for pair in leaf_pairs:
+				if cycles_created >= path_cycles:
+					break
+				var node_a = pair[0]
+				var node_b = pair[1]
+				var physical_distance = node_a.position.distance_to(node_b.position)
+				
+				if physical_distance < min_physical_distance:
+					min_physical_distance = physical_distance
+					closest_pair = pair
+				
+			var node_a = closest_pair[0]
+			var node_b = closest_pair[1]
+			if not path.are_points_connected(node_a.graph_id, node_b.graph_id):
+				path.connect_points(node_a.graph_id, node_b.graph_id, false)
+				create_corridor(node_a.position, node_b.position)
+				cycles_created += 1
+				print("Cycle created between: ", node_a, " and ", node_b)
+			leaf_pairs.erase(closest_pair)
+			
+
+func find_leaf_pairs(leaf_nodes, graph_connections):
+	var pairs = []
+	var max_distance = 2
+	
+	for i in range(leaf_nodes.size()):
+		for j in range(i + 1, leaf_nodes.size()):
+			var node_a = leaf_nodes[i]
+			var node_b = leaf_nodes[j]
+			var distance = get_branch_distance(node_a, node_b)
+			if distance <= max_distance:
+				#var physical_distance = node_a.position.distance_to(node_b.position)
+				pairs.append([node_a, node_b])
+	return pairs
+
+func get_branch_distance(node_a, node_b):
+	var path_a = get_path_to_root(node_a)
+	var path_b = get_path_to_root(node_b)
+	
+	# Find common ancestor
+	var common_ancestor = -1
+	var min_distance = INF
+	for i in range(path_a.size()):
+		for j in range(path_b.size()):
+			if path_a[i] == path_b[j]:
+				var distance = i + j
+				if distance < min_distance:
+					min_distance = distance
+					common_ancestor = path_a[i]
+	
+	#if common_ancestor == -1:
+		#return INF
+	
+	var distance_a = path_a.size() - path_a.find(common_ancestor) - 1
+	var distance_b = path_b.size() - path_b.find(common_ancestor) - 1
+	print("distance: ", max(distance_a, distance_b))
+	return max(distance_a, distance_b)
+
+func get_path_to_root(node):
+	var current_node = node
+	var current_path = []
+	
+	while current_node != null:
+		current_path.append(current_node.graph_id)
+		var connections = path.get_point_connections(current_node.graph_id)
+		if connections.size() > 0:
+			current_node = graph_id_to_room[connections[0]]
+		else:
+			current_node = null
+	
+	return path
+
+func create_corridor(start_position, end_position):
+	var new_corridor = corridor.instantiate()
+	new_corridor.make_corridor(start_position, end_position)
+	$Corridors.add_child(new_corridor)

@@ -26,7 +26,7 @@ func _draw():
 	elif is_end:
 		draw_rect(room_rect, Color(0.8, 0.2, 0), true)
 	elif main_path_index == -1:
-		draw_rect(room_rect, Color(0.2, 0.8, 0), true)
+		draw_rect(room_rect, Color(0.2, 0.8, 0), false)
 	else:
 		draw_rect(room_rect, Color(0.2, 0.8, 0), false)
 	
