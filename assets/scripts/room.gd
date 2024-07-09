@@ -19,18 +19,19 @@ func make_room(_position, _size):
 	$CollisionShape2D.shape = new_shape
 
 func _draw():
+	pass
 	#var room_rect = Rect2(position - size, size * 2)
-	var room_rect = Rect2(-size, size * 2)	
-	if is_start:
-		draw_rect(room_rect, Color(0.0, 0.2, 0.8), true)
-	elif is_end:
-		draw_rect(room_rect, Color(0.8, 0.2, 0), true)
-	elif main_path_index == -1:
-		draw_rect(room_rect, Color(0.2, 0.8, 0), false)
-	else:
-		draw_rect(room_rect, Color(0.2, 0.8, 0), false)
-	
-	draw_string(font, room_rect.position + Vector2(125,125), str(main_path_index), HORIZONTAL_ALIGNMENT_LEFT, -1, 100)
+	#var room_rect = Rect2(-size, size * 2)	
+	#if is_start:
+		#draw_rect(room_rect, Color(0.0, 0.2, 0.8), true)
+	#elif is_end:
+		#draw_rect(room_rect, Color(0.8, 0.2, 0), true)
+	#elif main_path_index == -1:
+		#draw_rect(room_rect, Color(0.2, 0.8, 0), false)
+	#else:
+		#draw_rect(room_rect, Color(0.2, 0.8, 0), false)
+	#
+	#draw_string(font, room_rect.position + Vector2(125,125), str(main_path_index), HORIZONTAL_ALIGNMENT_LEFT, -1, 100)
 
 func _process(delta):
 	queue_redraw()

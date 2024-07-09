@@ -7,9 +7,9 @@ var player = preload("res://assets/scenes/player.tscn")
 
 @export var tile_size = 32
 @export var num_rooms = 20
-@export var min_size = 5
-@export var max_size = 9
-@export var x_bias = 100
+@export var min_size = 6
+@export var max_size = 11
+@export var x_bias = 200
 @export var y_bias = 300
 @export var path_cycles = 1
 
@@ -17,13 +17,16 @@ var path : AStar2D # Graph that contains all the rooms and their corridors
 var graph_id_to_room
 var shortest_path_astar = AStar2D.new() # AStar for shortest path
 var player_spawn = null
-var debug_mode = true
+var debug_mode = false
 var start_room = null
 var end_room = null
 
 func _ready():
 	randomize()
-	await make_rooms()
+	if debug_mode:
+		await make_rooms()
+	else:
+		reset_level()
 
 func _draw():
 	if !debug_mode:
@@ -34,25 +37,39 @@ func _process(delta):
 
 func _input(event):
 	if event.is_action_pressed("ui_select"):
-		clear_map()
-		if !debug_mode:
-			debug_mode = true
-			$Camera2D.enabled = true
-		for r in $Rooms.get_children():
-			r.queue_free()
-		await get_tree().process_frame
-		path = null
-		make_rooms()
+		if debug_mode:
+			clear_map()
+			if !debug_mode:
+				debug_mode = true
+				$Camera2D.enabled = true
+			for r in $Rooms.get_children():
+				r.queue_free()
+			await get_tree().process_frame
+			path = null
+			make_rooms()
+		else:
+			reset_level()
 	
 	if event.is_action_pressed("ui_focus_next"):
-		generate_tiles()
+		if debug_mode:
+			generate_tiles()
 	
 	if event.is_action_pressed("ui_cancel"):
 		player_spawn = player.instantiate()
 		add_child(player_spawn)
-		player_spawn.position = start_room.position
+		player_spawn.position = Vector2(start_room.position.x, start_room.position.y + (start_room.size[1]))
 		debug_mode = false
 		$Camera2D.enabled = false
+	
+	if event.is_action_pressed("reset"):
+		reset_level()
+
+func reset_level():
+	clear_map()
+	make_rooms()
+	await get_tree().create_timer(1.1).timeout
+	generate_tiles()
+	spawn_player()
 
 func clear_map():
 	map.clear()
@@ -88,6 +105,7 @@ func make_rooms():
 		full_map = full_map.merge(rectangle)
 	
 	find_start_and_end_rooms()
+	#create_start_and_end_rooms(full_map)
 	
 	# Generate a minimum spanning tree
 	build_graph()
@@ -265,6 +283,37 @@ func find_start_and_end_rooms():
 	start_room.is_start = true
 	end_room.is_end = true
 
+func create_start_and_end_rooms(full_map):
+	var new_start_room = room.instantiate()
+	var start_room_width = min_size + randi() % (max_size - min_size)
+	var start_room_height = min_size + randi() % (max_size - min_size)
+	
+	var new_end_room = room.instantiate()
+	var end_room_width = min_size + randi() % (max_size - min_size)
+	var end_room_height = min_size + randi() % (max_size - min_size)
+	
+	#var start_coordinates = Vector2((-full_map.size[0] - full_map.size[0] / 2), (full_map.size[1] / 2 + start_room_height))
+	#var end_coordinates = Vector2((-full_map.size[0] - full_map.size[0] / 2), (-full_map.size[1] / 2 - end_room_height))
+	var start_x = (full_map.size[0] / 2) - full_map.size[0] / 2
+	var start_y = full_map.size[1] - ((full_map.size[1] / 2) - (full_map.size[1] / 10))
+	var end_x = (full_map.size[0] / 2) - full_map.size[0] / 2
+	var end_y = -full_map.size[1] + ((full_map.size[1] / 2) - (full_map.size[1] / 10))
+
+	var start_coordinates = Vector2(start_x, start_y)
+	var end_coordinates = Vector2(end_x, end_y)
+	
+	new_start_room.make_room(start_coordinates, Vector2(start_room_width, start_room_height) * tile_size)
+	new_start_room.is_start = true
+	start_room = new_start_room
+	$Rooms.add_child(start_room)
+	new_start_room.freeze
+	
+	new_end_room.make_room(end_coordinates, Vector2(end_room_width, start_room_height) * tile_size)
+	new_end_room.is_end = true
+	end_room = new_end_room
+	$Rooms.add_child(end_room)
+	new_end_room.freeze
+
 func find_main_path():
 	var path_from_start_to_end = path.get_id_path(start_room.graph_id, end_room.graph_id)
 	
@@ -280,126 +329,81 @@ func create_cycles():
 	var leaf_nodes = []
 	var graph_connections = {}
 	
-	# Find dead ends (leaves) and create map of connections
+	# Find leaf nodes and create a map of connections
+	var full_map_size = Rect2()
 	for room in $Rooms.get_children():
 		var connections = path.get_point_connections(room.graph_id)
 		graph_connections[room.graph_id] = connections
-		# Find all dead ends (not including start/end rooms)
 		if connections.size() == 1 and not room.is_start and not room.is_end:
 			leaf_nodes.append(room)
+		
+		var rectangle = Rect2(
+			room.position - room.size, 
+			room.get_node("CollisionShape2D").shape.extents * 2)
+		full_map_size = full_map_size.merge(rectangle)
 	
-	var leaf_pairs = find_leaf_pairs(leaf_nodes, graph_connections)
-	if leaf_pairs.is_empty():
-		return
+	var section_height = full_map_size.size.y / path_cycles
 	
-	# Sort pairs by physical distance
-	#leaf_pairs.sort_custom(LeafPairComparator)
-	#
-	#var cycles_created = 0
-	#for pair in leaf_pairs:
-		#if cycles_created >= path_cycles:
-			#break
-		#var node_a = pair[0]
-		#var node_b = pair[1]
-		#if not path.are_points_connected(node_a.graph_id, node_b.graph_id):
-			#path.connect_points(node_a.graph_id, node_b.graph_id, false)
-			#create_corridor(node_a.position, node_b.position)
-			#cycles_created += 1
-			#print("Cycle created between: ", node_a, " and ", node_b)
-	
-	# Create cycles based on defined constraint
+	# Create cycles based on the number of cycles requested
 	var cycles_created = 0
-	while cycles_created < path_cycles:
-		#var leaf_pairs = find_leaf_pairs(leaf_nodes, graph_connections)
-		var closest_pair = null
-		var min_physical_distance = INF
-		if leaf_pairs.is_empty():
-			return
-		else:
-			#for leaf in leaf_nodes:
-				#if leaf.is_on_main_path or leaf.is_start or leaf.is_end:
-					#continue
-				#for main_path_id in path.get_point_ids():
-					#var main_room = graph_id_to_room[main_path_id]
-					#if main_room.main_path_index > 0:
-						#path.connect_points(leaf.graph_id, main_room.graph_id, false)
-						#create_corridor(leaf.position, main_room.position)
-						#cycles_created += 1
-						#print("Fallback cycle created between leaf: ", leaf, " and main path node: ", main_room)
-						#return
-			for pair in leaf_pairs:
-				if cycles_created >= path_cycles:
-					break
-				var node_a = pair[0]
-				var node_b = pair[1]
-				var physical_distance = node_a.position.distance_to(node_b.position)
-				
-				if physical_distance < min_physical_distance:
-					min_physical_distance = physical_distance
-					closest_pair = pair
-				
-			var node_a = closest_pair[0]
-			var node_b = closest_pair[1]
-			if not path.are_points_connected(node_a.graph_id, node_b.graph_id):
-				path.connect_points(node_a.graph_id, node_b.graph_id, false)
-				create_corridor(node_a.position, node_b.position)
-				cycles_created += 1
-				print("Cycle created between: ", node_a, " and ", node_b)
-			leaf_pairs.erase(closest_pair)
-			
+	for cycle_index in range(path_cycles):
+		var section_start = cycle_index * section_height
+		var section_end = section_start + section_height
+		var section_leaf_nodes = leaf_nodes.filter(func(room):
+			return room.position.y >= section_start and room.position.y < section_end
+		)
+		
+		if section_leaf_nodes.is_empty():
+			continue
+		
+		var chosen_room = section_leaf_nodes[randi() % section_leaf_nodes.size()]
+		var closest_room = find_closest_room(chosen_room, section_leaf_nodes)
+		
+		if closest_room and not path.are_points_connected(chosen_room.graph_id, closest_room.graph_id):
+			path.connect_points(chosen_room.graph_id, closest_room.graph_id, false)
+			create_corridor(chosen_room.position, closest_room.position)
+			cycles_created += 1
+			print("Cycle created between: ", chosen_room, " and ", closest_room)
 
-func find_leaf_pairs(leaf_nodes, graph_connections):
-	var pairs = []
-	var max_distance = 2
-	
-	for i in range(leaf_nodes.size()):
-		for j in range(i + 1, leaf_nodes.size()):
-			var node_a = leaf_nodes[i]
-			var node_b = leaf_nodes[j]
-			var distance = get_branch_distance(node_a, node_b)
-			if distance <= max_distance:
-				#var physical_distance = node_a.position.distance_to(node_b.position)
-				pairs.append([node_a, node_b])
-	return pairs
+		if cycles_created >= path_cycles:
+			break
 
-func get_branch_distance(node_a, node_b):
-	var path_a = get_path_to_root(node_a)
-	var path_b = get_path_to_root(node_b)
-	
-	# Find common ancestor
-	var common_ancestor = -1
+func find_closest_room(chosen_room, section_leaf_nodes):
 	var min_distance = INF
-	for i in range(path_a.size()):
-		for j in range(path_b.size()):
-			if path_a[i] == path_b[j]:
-				var distance = i + j
-				if distance < min_distance:
-					min_distance = distance
-					common_ancestor = path_a[i]
-	
-	#if common_ancestor == -1:
-		#return INF
-	
-	var distance_a = path_a.size() - path_a.find(common_ancestor) - 1
-	var distance_b = path_b.size() - path_b.find(common_ancestor) - 1
-	print("distance: ", max(distance_a, distance_b))
-	return max(distance_a, distance_b)
+	var closest_room = null
+	var radius = 100  # Define a suitable radius for proximity check
 
-func get_path_to_root(node):
-	var current_node = node
-	var current_path = []
-	
-	while current_node != null:
-		current_path.append(current_node.graph_id)
-		var connections = path.get_point_connections(current_node.graph_id)
-		if connections.size() > 0:
-			current_node = graph_id_to_room[connections[0]]
-		else:
-			current_node = null
-	
-	return path
+	# First pass: Find closest room with one connection
+	for room in section_leaf_nodes:
+		if room == chosen_room:
+			continue
+		var distance = chosen_room.position.distance_to(room.position)
+		if distance < min_distance and distance <= radius:
+			min_distance = distance
+			closest_room = room
+
+	# If no close leaf node is found, find the closest room with two connections
+	if closest_room == null:
+		for room in $Rooms.get_children():
+			var connections = path.get_point_connections(room.graph_id)
+			if room == chosen_room or connections.size() != 2:
+				continue
+			var distance = chosen_room.position.distance_to(room.position)
+			if distance < min_distance and not path.are_points_connected(chosen_room.graph_id, room.graph_id):
+				min_distance = distance
+				closest_room = room
+
+	return closest_room
 
 func create_corridor(start_position, end_position):
 	var new_corridor = corridor.instantiate()
 	new_corridor.make_corridor(start_position, end_position)
 	$Corridors.add_child(new_corridor)
+
+func spawn_player():
+	player_spawn = player.instantiate()
+	add_child(player_spawn)
+	player_spawn.position = Vector2(start_room.position.x, start_room.position.y - (start_room.size[1] / 4))
+	debug_mode = false
+	$Camera2D.enabled = false
+	print("Player Position: ", player_spawn.position, "Start Room Center: ", (start_room.position))
