@@ -13,6 +13,7 @@ radius = 20.0
 
 [node name="Player" type="CharacterBody2D" parent="."]
 script = ExtResource("1_feuro")
+move_speed = 150.0
 
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Player"]
 remote_path = NodePath("../Camera2D")

@@ -6,6 +6,8 @@ var player = preload("res://assets/scenes/player.tscn")
 var enemy = preload("res://assets/scenes/enemy.tscn")
 var locked_door = preload("res://assets/scenes/door.tscn")
 var key = preload("res://assets/scenes/key.tscn")
+var powerup = preload("res://assets/scenes/powerup.tscn")
+var health_pickup = preload("res://assets/scenes/health_pickup.tscn")
 @onready var map = $TileMap
 
 @export var tile_size = 32
@@ -20,8 +22,8 @@ var path : AStar2D # Graph that contains all the rooms and their corridors
 var graph_id_to_room
 var shortest_path_astar = AStar2D.new() # AStar for shortest path
 var player_spawn = null
-var enemy_spawn = null
-var debug_mode = true
+var enemies = []
+var debug_mode = false
 var start_room = null
 var end_room = null
 
@@ -85,8 +87,8 @@ func clear_map():
 	if player_spawn:
 		player_spawn.queue_free()
 	
-	if enemy_spawn:
-		enemy_spawn.queue_free()
+	for e in enemies:
+		e.queue_free()
 	
 	for r in $Rooms.get_children():
 		r.queue_free()
@@ -151,7 +153,7 @@ func generate_tiles():
 	var bottom_right = map.local_to_map(full_rect.end)
 	for x in range (top_left.x, bottom_right.x):
 		for y in range (top_left.y, bottom_right.y):
-			map.set_cell(0, Vector2i(x, y), 1, Vector2i(1, 1), 0)
+			map.set_cell(0, Vector2i(x, y), 1, Vector2i(0, 3), 0)
 	
 	# Carve out rooms and corridors
 	var corridors = [] # One corridor per connection
@@ -166,7 +168,7 @@ func generate_tiles():
 				Vector2i(room_top_left.x + x, 
 				room_top_left.y + y), 
 				1, 
-				Vector2i(0, 3), 0)
+				Vector2i(1, 1), 0)
 		var current_room_id = path.get_closest_point(room.position)
 		for target_room_id in path.get_point_connections(current_room_id):
 			# Consider both directions without duplicating corridors
@@ -202,11 +204,11 @@ func carve_path(start, end):
 
 	for x in range(start.x, end.x, difference_x):
 		# Make corridors 2-tiles wide
-		map.set_cell(0, Vector2i(x, x_over_y.y), 1, Vector2i(0, 3), 0);
-		map.set_cell(0, Vector2i(x, x_over_y.y + difference_y), 1, Vector2i(0, 3), 0);
+		map.set_cell(0, Vector2i(x, x_over_y.y), 1, Vector2i(1, 1), 0);
+		map.set_cell(0, Vector2i(x, x_over_y.y + difference_y), 1, Vector2i(1, 1), 0);
 	for y in range(start.y, end.y, difference_y):
-		map.set_cell(0, Vector2i(y_over_x.x, y), 1, Vector2i(0, 3), 0);
-		map.set_cell(0, Vector2i(y_over_x.x + difference_x, y), 1, Vector2i(0, 3), 0);
+		map.set_cell(0, Vector2i(y_over_x.x, y), 1, Vector2i(1, 1), 0);
+		map.set_cell(0, Vector2i(y_over_x.x + difference_x, y), 1, Vector2i(1, 1), 0);
 
 func add_to_graph(graph, room):
 	var id = graph.get_available_point_id()
@@ -387,16 +389,26 @@ func spawn_player():
 	$Camera2D.enabled = false
 
 func spawn_enemy():
-	enemy_spawn = enemy.instantiate()
-	add_child(enemy_spawn)
-	var second_room = null
-	
+	var eligible_rooms = []
+
 	for room in $Rooms.get_children():
-		if room.main_path_index == start_room.main_path_index + 1:
-			second_room = room
-			break
+		if not room.is_start and not room.is_end:
+			eligible_rooms.append(room)
 	
-	enemy_spawn.position = Vector2(second_room.position.x, second_room.position.y - (second_room.size[1] / 4))
+	for i in range(10):
+		var chosen_room = eligible_rooms[randi() % eligible_rooms.size()]
+		var enemy_instance = enemy.instantiate()
+
+		# Random position within the room
+		var enemy_position = Vector2(
+			randf_range(-chosen_room.size.x / 2, chosen_room.size.x / 2),
+			randf_range(-chosen_room.size.y / 2, chosen_room.size.y / 2)
+		)
+
+		chosen_room.add_child(enemy_instance)
+		enemy_instance.position = enemy_position
+		print("Spawned enemy at: ", enemy_position, " in room: ", chosen_room)
+
 
 func place_gameplay_components():
 	var main_path_rooms = []
@@ -425,10 +437,36 @@ func place_gameplay_components():
 	# Place locked door in a room on the main path but not the start room
 	var locked_door_instance = locked_door.instantiate()
 	locked_door_room.add_child(locked_door_instance)
-	locked_door_instance.position = Vector2(locked_door_room.size.x / 2, locked_door_room.size.y / 2)
+	locked_door_instance.position = Vector2(0, 0)
 	
 	# Place key in an off-path room
 	var key_room = leaf_node_rooms[randi() % leaf_node_rooms.size()]
 	var key_instance = key.instantiate()
 	key_room.add_child(key_instance)
-	key_instance.position = Vector2(key_room.size.x / 2, key_room.size.y / 2)
+	key_instance.position = Vector2(0, 0)
+
+	# Place powerup in 3 random rooms
+	for i in range(3):
+		var powerup_room = off_path_rooms[randi() % off_path_rooms.size()]
+		
+		var powerup_position = Vector2(
+			randf_range(-powerup_room.size.x / 2, powerup_room.size.x / 2),
+			randf_range(-powerup_room.size.y / 2, powerup_room.size.y / 2)
+		)
+		
+		var powerup_instance = powerup.instantiate()
+		powerup_room.add_child(powerup_instance)
+		powerup_instance.position = powerup_position
+
+	# Place health pickup in 3 random rooms
+	for i in range(3):
+		var health_pickup_room = off_path_rooms[randi() % off_path_rooms.size()]
+		
+		var health_pickup_position = Vector2(
+			randf_range(-health_pickup_room.size.x / 2, health_pickup_room.size.x / 2),
+			randf_range(-health_pickup_room.size.y / 2, health_pickup_room.size.y / 2)
+		)
+		
+		var health_pickup_instance = health_pickup.instantiate()
+		health_pickup_room.add_child(health_pickup_instance)
+		health_pickup_instance.position = health_pickup_position

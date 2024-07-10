@@ -3,6 +3,7 @@ class_name Player
 
 @export var move_speed : float = 100
 var has_key = false
+var double_defense = false
 
 @onready var bullet_manager = $"../BulletManager"
 @onready var weapon = $Weapon
@@ -51,11 +52,20 @@ func shoot(bullet_instance, location, direction):
 	emit_signal("player_fired_bullet", bullet_instance, location, direction)
 
 func handle_hit():
-	health_stat.health -= 20
+	if double_defense:
+		health_stat.health -= 10
+	else:
+		health_stat.health -= 20
 	print("player health: ", health_stat.health)
 
 func pick_up_key():
 	has_key = true
+
+func pick_up_powerup():
+	double_defense = true
+
+func pick_up_health():
+	health_stat.health += 20
 
 func unlock_door(door):
 	if has_key:
