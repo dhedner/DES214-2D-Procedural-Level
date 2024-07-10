@@ -1,13 +1,17 @@
 extends CharacterBody2D
+class_name Player
 
 @export var move_speed : float = 100
-var bullet = preload("res://assets/scenes/bullet.tscn")
+var has_key = false
 
 @onready var bullet_manager = $"../BulletManager"
+@onready var weapon = $Weapon
+@onready var health_stat = $Health
 
 signal player_fired_bullet(bullet, position, direction)
 
 func _ready():
+	weapon.connect("weapon_fired", shoot)
 	player_fired_bullet.connect(Callable(bullet_manager, "handle_bullet_spawned"))
 
 func _input(event):
@@ -24,6 +28,8 @@ func _physics_process(delta):
 	if input_direction != Vector2.ZERO:
 		var target_rotation = input_direction.angle()
 		rotation = lerp_angle(rotation, target_rotation, 0.1)
+	
+	look_at(get_global_mouse_position())
 
 func get_input():
 	velocity = Vector2()
@@ -39,10 +45,19 @@ func get_input():
 
 func _unhandled_input(event):
 	if event.is_action_released("shoot"):
-		shoot()
+		weapon.shoot()
 
-func shoot():
-	var bullet_instance = bullet.instantiate()
-	var target = get_global_mouse_position()
-	var direction_to_mouse = global_position.direction_to(target).normalized()
-	emit_signal("player_fired_bullet", bullet_instance, global_position, direction_to_mouse)
+func shoot(bullet_instance, location, direction):
+	emit_signal("player_fired_bullet", bullet_instance, location, direction)
+
+func handle_hit():
+	health_stat.health -= 20
+	print("player health: ", health_stat.health)
+
+func pick_up_key():
+	has_key = true
+
+func unlock_door(door):
+	if has_key:
+		door.unlock()
+		has_key = false

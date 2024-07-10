@@ -18,6 +18,11 @@ func set_direction(new_direction):
 	travel_direction = new_direction
 	rotation += new_direction.angle()
 
-
 func _on_kill_timer_timeout():
 	queue_free()
+
+func _on_body_entered(body):
+	# Add check so that bullets don't hit the body that spawned them
+	if body.has_method("handle_hit") and body != self:
+		body.handle_hit()
+		queue_free()

@@ -1,31 +1,38 @@
-[gd_scene load_steps=5 format=3 uid="uid://c51wqe5hc7j1k"]
+[gd_scene load_steps=7 format=3 uid="uid://c51wqe5hc7j1k"]
 
 [ext_resource type="Script" path="res://assets/scripts/player.gd" id="1_feuro"]
-[ext_resource type="Texture2D" uid="uid://dsd3j8fjkkykk" path="res://icon.svg" id="1_w7msj"]
+[ext_resource type="Texture2D" uid="uid://bst4mmqjqar05" path="res://assets/sprites/Hero.png" id="2_nkilj"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="3_hcomu"]
+[ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="4_7t0nk"]
+[ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="5_5m8nb"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ogygc"]
 radius = 20.0
 
 [node name="Node2D" type="Node2D"]
 
-[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+[node name="Player" type="CharacterBody2D" parent="."]
 script = ExtResource("1_feuro")
 
-[node name="RemoteTransform2D" type="RemoteTransform2D" parent="CharacterBody2D"]
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Player"]
 remote_path = NodePath("../Camera2D")
 
-[node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
+[node name="Camera2D" type="Camera2D" parent="Player"]
 z_index = 2
 zoom = Vector2(2, 2)
 
-[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D"]
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
 rotation = 1.5708
-scale = Vector2(0.35, 0.35)
-texture = ExtResource("1_w7msj")
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("2_nkilj")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 shape = SubResource("CircleShape2D_ogygc")
+
+[node name="Health" parent="Player" instance=ExtResource("4_7t0nk")]
+
+[node name="Weapon" parent="Player" instance=ExtResource("5_5m8nb")]
+position = Vector2(33, 0)
 
 [node name="BulletManager" type="Node2D" parent="."]
 script = ExtResource("3_hcomu")

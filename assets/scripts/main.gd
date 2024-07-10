@@ -3,6 +3,9 @@ extends Node2D
 var room = preload("res://assets/scenes/room.tscn")
 var corridor = preload("res://assets/scenes/corridor.tscn")
 var player = preload("res://assets/scenes/player.tscn")
+var enemy = preload("res://assets/scenes/enemy.tscn")
+var locked_door = preload("res://assets/scenes/door.tscn")
+var key = preload("res://assets/scenes/key.tscn")
 @onready var map = $TileMap
 
 @export var tile_size = 32
@@ -17,7 +20,8 @@ var path : AStar2D # Graph that contains all the rooms and their corridors
 var graph_id_to_room
 var shortest_path_astar = AStar2D.new() # AStar for shortest path
 var player_spawn = null
-var debug_mode = false
+var enemy_spawn = null
+var debug_mode = true
 var start_room = null
 var end_room = null
 
@@ -63,6 +67,9 @@ func _input(event):
 	
 	if event.is_action_pressed("reset"):
 		reset_level()
+	
+	if event.is_action_pressed("change_camera"):
+		pass
 
 func reset_level():
 	clear_map()
@@ -70,12 +77,16 @@ func reset_level():
 	await get_tree().create_timer(1.1).timeout
 	generate_tiles()
 	spawn_player()
+	spawn_enemy()
 
 func clear_map():
 	map.clear()
 	
 	if player_spawn:
 		player_spawn.queue_free()
+	
+	if enemy_spawn:
+		enemy_spawn.queue_free()
 	
 	for r in $Rooms.get_children():
 		r.queue_free()
@@ -112,7 +123,7 @@ func make_rooms():
 	create_corridors_from_graph()
 	find_main_path()
 	create_cycles()
-	
+	place_gameplay_components()
 	check_room_distribution(full_map)
 
 func check_room_distribution(map_size):
@@ -141,10 +152,9 @@ func generate_tiles():
 	for x in range (top_left.x, bottom_right.x):
 		for y in range (top_left.y, bottom_right.y):
 			map.set_cell(0, Vector2i(x, y), 1, Vector2i(1, 1), 0)
-		
-	# Carve out rooms
-	var corridors = [] # One corridor per connection
 	
+	# Carve out rooms and corridors
+	var corridors = [] # One corridor per connection
 	for room in $Rooms.get_children():
 		var size = (room.size / tile_size).floor()
 		var position = map.local_to_map(room.position)
@@ -157,17 +167,20 @@ func generate_tiles():
 				room_top_left.y + y), 
 				1, 
 				Vector2i(0, 3), 0)
-		var current_path = path.get_closest_point(room.position)
-		for connection in path.get_point_connections(current_path):
-			if not connection in corridors:
+		var current_room_id = path.get_closest_point(room.position)
+		for target_room_id in path.get_point_connections(current_room_id):
+			# Consider both directions without duplicating corridors
+			var connection_pair = {current_room_id: null, target_room_id: null}
+			if not connection_pair in corridors:
 				var starting_point = map.local_to_map(Vector2(
-					path.get_point_position(current_path).x, 
-					path.get_point_position(current_path).y))
+					path.get_point_position(current_room_id).x, 
+					path.get_point_position(current_room_id).y))
 				var ending_point = map.local_to_map(Vector2(
-					path.get_point_position(connection).x, 
-					path.get_point_position(connection).y))
+					path.get_point_position(target_room_id).x, 
+					path.get_point_position(target_room_id).y))
 				carve_path(starting_point, ending_point)
-			corridors.append(current_path)
+				corridors.append(connection_pair)
+	#print("paths carved: ", corridors.size())
 
 func carve_path(start, end):
 	# Carve a path between two points
@@ -256,9 +269,6 @@ func create_corridors_from_graph():
 			$Corridors.add_child(current_corridor)
 			
 			var current_room = graph_id_to_room[connection]
-			
-			if current_room.is_end:
-				current_corridor.locked = true
 
 func find_start_and_end_rooms():
 	var min_axis = INF
@@ -282,37 +292,6 @@ func find_start_and_end_rooms():
 				max_axis = room.position.x
 	start_room.is_start = true
 	end_room.is_end = true
-
-func create_start_and_end_rooms(full_map):
-	var new_start_room = room.instantiate()
-	var start_room_width = min_size + randi() % (max_size - min_size)
-	var start_room_height = min_size + randi() % (max_size - min_size)
-	
-	var new_end_room = room.instantiate()
-	var end_room_width = min_size + randi() % (max_size - min_size)
-	var end_room_height = min_size + randi() % (max_size - min_size)
-	
-	#var start_coordinates = Vector2((-full_map.size[0] - full_map.size[0] / 2), (full_map.size[1] / 2 + start_room_height))
-	#var end_coordinates = Vector2((-full_map.size[0] - full_map.size[0] / 2), (-full_map.size[1] / 2 - end_room_height))
-	var start_x = (full_map.size[0] / 2) - full_map.size[0] / 2
-	var start_y = full_map.size[1] - ((full_map.size[1] / 2) - (full_map.size[1] / 10))
-	var end_x = (full_map.size[0] / 2) - full_map.size[0] / 2
-	var end_y = -full_map.size[1] + ((full_map.size[1] / 2) - (full_map.size[1] / 10))
-
-	var start_coordinates = Vector2(start_x, start_y)
-	var end_coordinates = Vector2(end_x, end_y)
-	
-	new_start_room.make_room(start_coordinates, Vector2(start_room_width, start_room_height) * tile_size)
-	new_start_room.is_start = true
-	start_room = new_start_room
-	$Rooms.add_child(start_room)
-	new_start_room.freeze
-	
-	new_end_room.make_room(end_coordinates, Vector2(end_room_width, start_room_height) * tile_size)
-	new_end_room.is_end = true
-	end_room = new_end_room
-	$Rooms.add_child(end_room)
-	new_end_room.freeze
 
 func find_main_path():
 	var path_from_start_to_end = path.get_id_path(start_room.graph_id, end_room.graph_id)
@@ -406,4 +385,50 @@ func spawn_player():
 	player_spawn.position = Vector2(start_room.position.x, start_room.position.y - (start_room.size[1] / 4))
 	debug_mode = false
 	$Camera2D.enabled = false
-	print("Player Position: ", player_spawn.position, "Start Room Center: ", (start_room.position))
+
+func spawn_enemy():
+	enemy_spawn = enemy.instantiate()
+	add_child(enemy_spawn)
+	var second_room = null
+	
+	for room in $Rooms.get_children():
+		if room.main_path_index == start_room.main_path_index + 1:
+			second_room = room
+			break
+	
+	enemy_spawn.position = Vector2(second_room.position.x, second_room.position.y - (second_room.size[1] / 4))
+
+func place_gameplay_components():
+	var main_path_rooms = []
+	var off_path_rooms = []
+	var leaf_node_rooms = []
+	
+	for room in $Rooms.get_children():
+		var connections = path.get_point_connections(room.graph_id)
+		if room.main_path_index != -1:
+			main_path_rooms.append(room)
+		else:
+			off_path_rooms.append(room)
+			if connections.size() == 1 and not room.is_start and not room.is_end:
+				leaf_node_rooms.append(room)
+	
+	if off_path_rooms.size() == 0 or main_path_rooms.size() <= 1:
+		return
+	
+	var end_room_index = end_room.main_path_index
+	var locked_door_room = null
+	for room in main_path_rooms:
+		if room.main_path_index == end_room_index - 1:
+			locked_door_room = room
+			break
+	
+	# Place locked door in a room on the main path but not the start room
+	var locked_door_instance = locked_door.instantiate()
+	locked_door_room.add_child(locked_door_instance)
+	locked_door_instance.position = Vector2(locked_door_room.size.x / 2, locked_door_room.size.y / 2)
+	
+	# Place key in an off-path room
+	var key_room = leaf_node_rooms[randi() % leaf_node_rooms.size()]
+	var key_instance = key.instantiate()
+	key_room.add_child(key_instance)
+	key_instance.position = Vector2(key_room.size.x / 2, key_room.size.y / 2)
