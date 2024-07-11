@@ -8,6 +8,13 @@ enum State {
 	ENGAGE
 }
 
+enum Variety {
+	TURRET,
+	RANGER,
+	FIGHTER,
+	BOSS
+}
+
 @onready var player_detection_zone = $PlayerDetectionZone
 @onready var patrol_timer = $PatrolTimer
 #@onready var bullet_manager = $"../BulletManager"
@@ -43,6 +50,7 @@ func _physics_process(delta):
 				actor.rotation = actor.global_position.direction_to(player.global_position).angle()
 				weapon.shoot()
 
+# Pseudo constructor
 func initialize(actor, weapon):
 	self.actor = actor
 	self.weapon = weapon
