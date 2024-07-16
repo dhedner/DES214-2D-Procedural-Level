@@ -17,6 +17,7 @@ func _on_body_entered(body):
 
 func unlock():
 	is_locked = false
+	$StaticBody2D/CollisionShape2D.set_deferred("disabled", true)
 	$StaticBody2D/CollisionShape2D.disabled = true
 	$Sprite2D.texture = load("res://assets/sprites/UnlockedDoor.png")
 

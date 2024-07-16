@@ -51,11 +51,11 @@ func _unhandled_input(event):
 func shoot(bullet_instance, location, direction):
 	emit_signal("player_fired_bullet", bullet_instance, location, direction)
 
-func handle_hit():
+func handle_hit(damage):
 	if double_defense:
-		health_stat.health -= 10
+		health_stat.health -= damage / 2
 	else:
-		health_stat.health -= 20
+		health_stat.health -= damage
 	print("player health: ", health_stat.health)
 
 func pick_up_key():

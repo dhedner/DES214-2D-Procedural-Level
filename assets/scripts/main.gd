@@ -1,34 +1,29 @@
 extends Node2D
 
-@onready var level_manager = $Level
-
-var room = preload("res://assets/scenes/room.tscn")
-var corridor = preload("res://assets/scenes/corridor.tscn")
 var player = preload("res://assets/scenes/player.tscn")
-var enemy = preload("res://assets/scenes/enemy.tscn")
-var locked_door = preload("res://assets/scenes/door.tscn")
-var key = preload("res://assets/scenes/key.tscn")
-var powerup = preload("res://assets/scenes/powerup.tscn")
-var health_pickup = preload("res://assets/scenes/health_pickup.tscn")
+var level_exit = preload("res://assets/scenes/level_exit.tscn")
 
-var debug_mode = true
+@onready var level_manager = $Level
+@onready var map_ai = $MapAI
+@onready var tilemap = $TileMap
+@onready var pathfinding = $Pathfinding
 
-#var player_spawn = null
-#var enemies = []
+var debug_mode = false
 
 func _ready():
 	randomize()
-	if debug_mode:
-		await level_manager.make_rooms()
-	#else:
-		#reset_level()
+	connect("level_exit_reached", exit_reached)
 
-#func _draw():
-	#if !debug_mode:
-		#return
+	level_manager.reset_level(tilemap)
+	await get_tree().create_timer(1.1).timeout
+	pathfinding.create_navigation_map(tilemap)
+	map_ai.initialize(pathfinding)
+	
+	map_ai.spawn_enemy_shooter(Vector2(516, 0))
+	spawn_player()
 
-#func _process(delta):
-	#queue_redraw()
+func _draw():
+	queue_redraw()
 
 func _input(event):
 	if event.is_action_pressed("ui_select"):
@@ -45,15 +40,8 @@ func _input(event):
 		if debug_mode:
 			level_manager.generate_tiles()
 	
-	#if event.is_action_pressed("ui_cancel"):
-		#player_spawn = player.instantiate()
-		#add_child(player_spawn)
-		#player_spawn.position = Vector2(start_room.position.x, start_room.position.y + (start_room.size[1]))
-		#debug_mode = false
-		#$Camera2D.enabled = false
-	
 	if event.is_action_pressed("reset"):
-		#reset_level()
+		level_manager.reset_level()
 		pass
 	
 	if event.is_action_pressed("change_camera"):
@@ -62,30 +50,35 @@ func _input(event):
 func spawn_player():
 	var player_spawn = player.instantiate()
 	add_child(player_spawn)
-	#player_spawn.position = Vector2(start_room.position.x, start_room.position.y - (start_room.size[1] / 4))
+	player_spawn.position = Vector2(
+		level_manager.start_room.position.x, 
+		level_manager.start_room.position.y - (level_manager.start_room.size[1] / 4))
 	debug_mode = false
 	$Camera2D.enabled = false
 
-func spawn_enemy():
-	var eligible_rooms = []
+func exit_reached():
+	level_manager.reset_level(tilemap)
 
-	for room in $Rooms.get_children():
-		if not room.is_start and not room.is_end:
-			eligible_rooms.append(room)
-	
-	for i in range(10):
-		var chosen_room = eligible_rooms[randi() % eligible_rooms.size()]
-		var enemy_instance = enemy.instantiate()
+#func spawn_enemy():
+	#var eligible_rooms = []
+#
+	#for room in $Rooms.get_children():
+		#if not room.is_start and not room.is_end:
+			#eligible_rooms.append(room)
+	#
+	#for i in range(10):
+		#var chosen_room = eligible_rooms[randi() % eligible_rooms.size()]
+		##var enemy_instance = enemy.instantiate()
+#
+		## Random position within the room
+		#var enemy_position = Vector2(
+			#randf_range(-chosen_room.size.x / 2, chosen_room.size.x / 2),
+			#randf_range(-chosen_room.size.y / 2, chosen_room.size.y / 2)
+		#)
 
-		# Random position within the room
-		var enemy_position = Vector2(
-			randf_range(-chosen_room.size.x / 2, chosen_room.size.x / 2),
-			randf_range(-chosen_room.size.y / 2, chosen_room.size.y / 2)
-		)
-
-		chosen_room.add_child(enemy_instance)
-		enemy_instance.position = enemy_position
-		print("Spawned enemy at: ", enemy_position, " in room: ", chosen_room)
+		#chosen_room.add_child(enemy_instance)
+		#enemy_instance.position = enemy_position
+		#print("Spawned enemy at: ", enemy_position, " in room: ", chosen_room)
 
 
 func place_gameplay_components():

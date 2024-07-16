@@ -1,11 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://cha8w0vfkicu8"]
+[gd_scene load_steps=9 format=3 uid="uid://bp5u7kx4c12gd"]
 
-[ext_resource type="Texture2D" uid="uid://cjf62shv1c3gf" path="res://assets/sprites/Enemy.png" id="1_eeoog"]
-[ext_resource type="Script" path="res://assets/scripts/enemyAI.gd" id="1_smpxb"]
-[ext_resource type="Script" path="res://assets/scripts/enemy.gd" id="1_yjmp1"]
-[ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="4_rms4k"]
-[ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="5_p4nm0"]
-[ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_mlq5r"]
+[ext_resource type="Script" path="res://assets/scripts/enemy.gd" id="1_uxkha"]
+[ext_resource type="Texture2D" uid="uid://cdx5c24c3qnsr" path="res://assets/sprites/ToughEnemy.png" id="2_tontx"]
+[ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="3_tpekm"]
+[ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_a33xf"]
+[ext_resource type="Script" path="res://assets/scripts/enemy_shooterAI.gd" id="5_glbcv"]
+[ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_4xmcy"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_sm8x5"]
 radius = 20.0
@@ -13,24 +13,24 @@ radius = 20.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_2qne8"]
 radius = 100.0
 
-[node name="Enemy" type="CharacterBody2D"]
-script = ExtResource("1_yjmp1")
+[node name="Shooter Enemy" type="CharacterBody2D"]
+script = ExtResource("1_uxkha")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 rotation = 1.5708
 scale = Vector2(0.7, 0.7)
-texture = ExtResource("1_eeoog")
+texture = ExtResource("2_tontx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_sm8x5")
 
-[node name="Health" parent="." instance=ExtResource("4_rms4k")]
+[node name="Health" parent="." instance=ExtResource("3_tpekm")]
 
-[node name="Weapon" parent="." instance=ExtResource("5_p4nm0")]
+[node name="Weapon" parent="." instance=ExtResource("4_a33xf")]
 position = Vector2(33, 0)
 
 [node name="AI" type="Node2D" parent="."]
-script = ExtResource("1_smpxb")
+script = ExtResource("5_glbcv")
 
 [node name="PlayerDetectionZone" type="Area2D" parent="AI"]
 
@@ -42,7 +42,7 @@ wait_time = 3.0
 one_shot = true
 
 [node name="BulletManager" type="Node2D" parent="."]
-script = ExtResource("6_mlq5r")
+script = ExtResource("6_4xmcy")
 
 [connection signal="body_entered" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_entered"]
 [connection signal="body_exited" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_exited"]

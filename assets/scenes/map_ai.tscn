@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bj2oytfctgclm"]
+
+[ext_resource type="Script" path="res://assets/scripts/map_ai.gd" id="1_no3ce"]
+
+[node name="MapAI" type="Node2D"]
+script = ExtResource("1_no3ce")
+
+[node name="EnemyContainer" type="Node2D" parent="."]
