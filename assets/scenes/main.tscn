@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://cvetfippmsxli"]
 
-[ext_resource type="Script" path="res://assets/scripts/main.gd" id="1_3sh7e"]
+[ext_resource type="Script" path="res://assets/scripts/main_testing.gd" id="1_0yud5"]
 [ext_resource type="Texture2D" uid="uid://5uks27d5v8wq" path="res://assets/sprites/cavern.png" id="2_2t1j4"]
 [ext_resource type="PackedScene" uid="uid://jl64cwk2yjse" path="res://assets/scenes/level.tscn" id="2_pwn6v"]
 [ext_resource type="Script" path="res://assets/scripts/pathfinding.gd" id="3_5b60q"]
@@ -63,7 +63,7 @@ physics_layer_0/collision_layer = 1
 sources/1 = SubResource("TileSetAtlasSource_5eo72")
 
 [node name="Main" type="Node2D"]
-script = ExtResource("1_3sh7e")
+script = ExtResource("1_0yud5")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 z_index = 1

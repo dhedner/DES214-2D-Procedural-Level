@@ -21,8 +21,7 @@ var end_room = null
 
 func reset_level(tilemap: TileMap):
 	clear_map(tilemap)
-	make_rooms(tilemap)
-	await get_tree().create_timer(1.1).timeout
+	await make_rooms(tilemap)
 	generate_tiles(tilemap)
 
 func clear_map(tilemap: TileMap):
@@ -35,6 +34,8 @@ func clear_map(tilemap: TileMap):
 		c.queue_free()
 	
 	path = null
+	
+	
 
 func make_rooms(tilemap: TileMap):
 	generate_diverse_rooms()
@@ -58,15 +59,12 @@ func make_rooms(tilemap: TileMap):
 	find_main_path()
 	create_cycles()
 	check_room_distribution(tilemap, full_map)
+	assign_distance_index()
 
 func check_room_distribution(tilemap: TileMap, map_size):
 	if ((map_size.size.x / 2) > map_size.size.y) or ((map_size.size.y / 2) > map_size.size.x):
 		print("Undesirable map size: ", map_size.size)
-		clear_map(tilemap)
-		for r in $Rooms.get_children():
-			r.queue_free()
-		path = null
-		make_rooms(tilemap)
+		await reset_level(tilemap)
 
 # Change to use various layers of the same tile map (0 for floor)
 func generate_tiles(tilemap: TileMap):
@@ -315,7 +313,7 @@ func create_cycles():
 		var closest_room = find_closest_room(chosen_room, section_leaf_nodes)
 		
 		if closest_room and not path.are_points_connected(chosen_room.graph_id, closest_room.graph_id):
-			path.connect_points(chosen_room.graph_id, closest_room.graph_id, false)
+			path.connect_points(chosen_room.graph_id, closest_room.graph_id, true)
 			create_corridor(chosen_room.position, closest_room.position)
 			cycles_created += 1
 			print("Cycle created between: ", chosen_room, " and ", closest_room)
@@ -376,6 +374,7 @@ func generate_diverse_rooms():
 		var current_room = room.instantiate()
 		var room_size = Vector2(max_size + 2 + randi() % 3, max_size + 2 + randi() % 3)
 		current_room.make_room(room_position, room_size * tile_size)
+		current_room.is_arena = true
 		$Rooms.add_child(current_room)
 	
 	# Create a set of cramped rooms that are small and proportionate
@@ -398,3 +397,29 @@ func create_corridor(start_position, end_position):
 	var new_corridor = corridor.instantiate()
 	new_corridor.make_corridor(start_position, end_position)
 	$Corridors.add_child(new_corridor)
+
+func explore_distances(start_room):
+	var visited = {}
+	var queue = []
+
+	queue.append([0, start_room.graph_id])
+
+	while queue.size() > 0:
+		var current = queue.pop_front()
+		var current_distance = current[0]
+		var current_id = current[1]
+
+		if current_id in visited:
+			continue
+
+		visited[current_id] = current_distance
+
+		for connection in path.get_point_connections(current_id):
+			queue.append([current_distance + 1, connection])
+	
+	return visited
+
+func assign_distance_index():
+	var distances = explore_distances(start_room)
+	for room in $Rooms.get_children():
+		room.distance_index = distances[room.graph_id]
