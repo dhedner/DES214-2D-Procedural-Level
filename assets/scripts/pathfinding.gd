@@ -47,8 +47,8 @@ func get_id_for_point(point: Vector2):
 
 # Start and end are both in world coordinates
 func get_new_path(start: Vector2, end: Vector2):
-	var start_id = get_id_for_point(tilemap.local_to_map(start))
-	var end_id = get_id_for_point(tilemap.local_to_map(end))
+	var start_id = get_id_for_point(tilemap.local_to_map(start + half_cell_size))
+	var end_id = get_id_for_point(tilemap.local_to_map(end + half_cell_size))
 
 	if not astar.has_point(start_id) or not astar.has_point(end_id):
 		return []
@@ -57,7 +57,12 @@ func get_new_path(start: Vector2, end: Vector2):
 	var path_world = []
 
 	for point in path_map:
-		var point_world = tilemap.map_to_local(point) +	half_cell_size
+		var point_world = tilemap.map_to_local(point) -	half_cell_size
 		path_world.append(point_world)
+	
+	if path_world.size() > 0:
+		path_world.pop_front()
+		
+	path_world.push_back(end)
 	
 	return path_world
