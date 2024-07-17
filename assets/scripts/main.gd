@@ -5,8 +5,10 @@ var boss = preload("res://assets/scenes/enemy_boss.tscn")
 var level_exit = preload("res://assets/scenes/level_exit.tscn")
 var locked_door = preload("res://assets/scenes/door.tscn")
 var key = preload("res://assets/scenes/key.tscn")
-var powerup = preload("res://assets/scenes/powerup.tscn")
+var firerate_pickup = preload("res://assets/scenes/firerate_pickup.tscn")
 var health_pickup = preload("res://assets/scenes/health_pickup.tscn")
+var heart_container = preload("res://assets/scenes/heart_container.tscn")
+var swift_boots = preload("res://assets/scenes/swift_boots.tscn")
 var crate = preload("res://assets/scenes/crate.tscn")
 
 @onready var level_manager = $Level
@@ -18,21 +20,22 @@ var crate = preload("res://assets/scenes/crate.tscn")
 @onready var corridor_container = $Level/Corridors
 
 var debug_mode = false
+var tutorial_room = null
 
 var enemy_spawn_grammar = {
 	"arena_easy": [
-		{"type": "turret", "count": 2, "probability": 0.5},
-		{"type": "shooter", "count": 1, "probability": 0.5},
+		{"type": "turret", "count": 2, "probability": 1.0},
+		{"type": "shooter", "count": 1, "probability": 1.0},
 	],
 	"arena_moderate": [
-		{"type": "turret", "count": 2, "probability": 0.3},
-		{"type": "shooter", "count": 2, "probability": 0.4},
-		{"type": "fighter", "count": 1, "probability": 0.3},
+		{"type": "turret", "count": 2, "probability": 0.7},
+		{"type": "shooter", "count": 1, "probability": 0.8},
+		{"type": "fighter", "count": 2, "probability": 0.6},
 	],
 	"arena_hard": [
-		{"type": "turret", "count": 3, "probability": 0.2},
-		{"type": "shooter", "count": 3, "probability": 0.4},
-		{"type": "fighter", "count": 2, "probability": 0.4},
+		{"type": "turret", "count": 3, "probability": 0.8},
+		{"type": "shooter", "count": 2, "probability": 0.8},
+		{"type": "fighter", "count": 2, "probability": 0.8},
 	],
 	"room_easy": [
 		{"type": "turret", "count": 1, "probability": 0.4},
@@ -42,12 +45,12 @@ var enemy_spawn_grammar = {
 	"room_moderate": [
 		{"type": "turret", "count": 1, "probability": 0.3},
 		{"type": "shooter", "count": 1, "probability": 0.3},
-		{"type": "fighter", "count": 1, "probability": 0.3},
+		{"type": "fighter", "count": 1, "probability": 0.4},
 		{"type": "empty", "probability": 0.1}
 	],
 	"room_hard": [
 		{"type": "shooter", "count": 2, "probability": 0.4},
-		{"type": "fighter", "count": 2, "probability": 0.4},
+		{"type": "fighter", "count": 1, "probability": 0.7},
 		{"type": "empty", "probability": 0.2}
 	]
 }
@@ -65,6 +68,14 @@ func _ready():
 	spawn_enemies()
 	spawn_boss()
 	place_gameplay_components()
+	
+	var turret_position = Vector2(
+		randf_range(-tutorial_room.size.x / 2, tutorial_room.size.x / 2),
+		randf_range(-tutorial_room.size.y / 2, tutorial_room.size.y / 2)
+	)
+	
+	var turret_instance = map_ai.spawn_enemy_turret(tutorial_room.position)
+	tutorial_room.add_child(turret_instance)
 
 func _draw():
 	queue_redraw()
@@ -113,6 +124,8 @@ func spawn_enemies():
 
 	# Collect eligible rooms (excluding start and end rooms)
 	for room in room_container.get_children():
+		if room.main_path_index == 1:
+			tutorial_room = room
 		if not room.is_start and not room.is_end and not room.main_path_index == 1:
 			eligible_rooms.append(room)
 	
@@ -124,17 +137,23 @@ func spawn_enemies():
 func determine_enemy_rule(room):
 	var rule_key = ""
 
+	# Find maximum room distance index
+	var max_distance_index = 0
+	for current_room in room_container.get_children():
+		if current_room.distance_index > max_distance_index:
+			max_distance_index = current_room.distance_index
+
 	if room.is_arena:
-		if room.distance_index <= room_container.get_children().size() / 3:
+		if room.distance_index <= max_distance_index / 3:
 			rule_key = "arena_easy"
-		elif room.distance_index <= room_container.get_children().size() / 2:
+		elif room.distance_index <= max_distance_index / 2:
 			rule_key = "arena_moderate"
 		else:
 			rule_key = "arena_hard"
 	else:
-		if room.distance_index <= room_container.get_children().size() / 3:
+		if room.distance_index <= max_distance_index / 3:
 			rule_key = "room_easy"
-		elif room.distance_index <= room_container.get_children().size() / 2:
+		elif room.distance_index <= max_distance_index / 2:
 			rule_key = "room_moderate"
 		else:
 			rule_key = "room_hard"
@@ -196,36 +215,39 @@ func place_gameplay_components():
 	key_instance.position = Vector2(0, 0)
 	leaf_node_rooms.erase(leaf_node_rooms.find(key_room))
 
-	# Place powerup in 3 random rooms
-	for i in range(3):
-		var powerup_room = off_path_rooms[randi() % off_path_rooms.size()]
-		
-		var powerup_position = Vector2(
-			randf_range(-powerup_room.size.x / 2, powerup_room.size.x / 2),
-			randf_range(-powerup_room.size.y / 2, powerup_room.size.y / 2)
-		)
-		
-		var powerup_instance = powerup.instantiate()
-		powerup_room.add_child(powerup_instance)
-		powerup_instance.position = powerup_position
-		off_path_rooms.erase(off_path_rooms.find(powerup_room))
+	# Place fire rate pickup in 1 random leaf node room
+	var firerate_pickup_room = off_path_rooms[randi() % off_path_rooms.size()]
+	while firerate_pickup_room == key_room:
+		firerate_pickup_room = off_path_rooms[randi() % off_path_rooms.size()]
 
-	# Place health pickup in 3 random rooms
-	for i in range(3):
-		var health_pickup_room = off_path_rooms[randi() % off_path_rooms.size()]
-		
-		var health_pickup_position = Vector2(
-			randf_range(-health_pickup_room.size.x / 2, health_pickup_room.size.x / 2),
-			randf_range(-health_pickup_room.size.y / 2, health_pickup_room.size.y / 2)
-		)
-		
-		var health_pickup_instance = health_pickup.instantiate()
-		health_pickup_room.add_child(health_pickup_instance)
-		health_pickup_instance.position = health_pickup_position
-		off_path_rooms.erase(off_path_rooms.find(health_pickup_room))
+	var firerate_pickup_instance = firerate_pickup.instantiate()
+	firerate_pickup_room.add_child(firerate_pickup_instance)
+
+	var firerate_pickup_position = Vector2(
+		randf_range(-firerate_pickup_room.size.x / 2, firerate_pickup_room.size.x / 2),
+		randf_range(-firerate_pickup_room.size.y / 2, firerate_pickup_room.size.y / 2)
+	)
+
+	firerate_pickup_instance.position = firerate_pickup_position
+	off_path_rooms.erase(off_path_rooms.find(firerate_pickup_room))
+
+	# Place swift boots in 1 random leaf node room
+	var swift_boots_room = off_path_rooms[randi() % off_path_rooms.size()]
+	while swift_boots_room == key_room || swift_boots_room == firerate_pickup_room:
+		swift_boots_room = off_path_rooms[randi() % off_path_rooms.size()]
+	var swift_boots_instance = swift_boots.instantiate()
+	swift_boots_room.add_child(swift_boots_instance)
+
+	var swift_boots_position = Vector2(
+		randf_range(-swift_boots_room.size.x / 2, swift_boots_room.size.x / 2),
+		randf_range(-swift_boots_room.size.y / 2, swift_boots_room.size.y / 2)
+	)
+
+	swift_boots_instance.position = swift_boots_position
+	off_path_rooms.erase(off_path_rooms.find(swift_boots_room))
 	
-	# Place crates in 5 random rooms
-	for i in range(5):
+	# Place crates in 10 random rooms
+	for i in range(10):
 		var crate_room = off_path_rooms[randi() % off_path_rooms.size()]
 		
 		var crate_position = Vector2(
@@ -236,9 +258,9 @@ func place_gameplay_components():
 		var crate_instance = crate.instantiate()
 		crate_room.add_child(crate_instance)
 		crate_instance.position = crate_position
-		off_path_rooms.erase(off_path_rooms.find(crate_room))
+
 	
 	# Place level exit in the end room
-	var level_exit_instance = level_exit.instantiate()
-	level_manager.end_room.add_child(level_exit_instance)
-	level_exit_instance.position = Vector2(0, 0)
+	#var level_exit_instance = level_exit.instantiate()
+	#level_manager.end_room.add_child(level_exit_instance)
+	#level_exit_instance.position = Vector2(0, 0)

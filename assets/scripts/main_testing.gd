@@ -4,8 +4,6 @@ var player = preload("res://assets/scenes/player.tscn")
 var level_exit = preload("res://assets/scenes/level_exit.tscn")
 var locked_door = preload("res://assets/scenes/door.tscn")
 var key = preload("res://assets/scenes/key.tscn")
-var powerup = preload("res://assets/scenes/powerup.tscn")
-var health_pickup = preload("res://assets/scenes/health_pickup.tscn")
 
 @onready var tilemap = $TileMap
 @onready var pathfinding = $Pathfinding

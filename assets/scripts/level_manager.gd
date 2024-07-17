@@ -54,7 +54,7 @@ func make_rooms(tilemap: TileMap):
 		full_map = full_map.merge(rectangle)
 	
 	# Generate a minimum spanning tree
-	build_graph()
+	await build_graph()
 	create_corridors_from_graph()
 	find_main_path()
 	create_cycles()
@@ -154,6 +154,34 @@ func carve_path(tilemap : TileMap, start, end):
 		tilemap.set_cell(1, Vector2i(y_over_x.x, y), -1)
 		tilemap.set_cell(0, Vector2i(y_over_x.x + difference_x, y), 1, Vector2i(1, 1), 0);
 		tilemap.set_cell(1, Vector2i(y_over_x.x + difference_x, y), -1)
+
+func generate_columns(tilemap: TileMap, num_columns: int):
+	var rooms = $Rooms.get_children()
+	var valid_rooms = []
+	
+	# Filter out rooms that are too small to have columns
+	for room in rooms:
+		var size = (room.size / tile_size).floor()
+		if size.x >= min_size + 2 and size.y >= min_size + 2 and not room.is_arena:
+			valid_rooms.append(room)
+	
+	# Randomly select rooms to have columns
+	for i in range(min(num_columns, valid_rooms.size())):
+		var room = valid_rooms[randi() % valid_rooms.size()]
+		var size = (room.size / tile_size).floor()
+		var center = tilemap.local_to_map(room.position)
+		
+		# Determine column size (example: based on room size)
+		var column_size = Vector2(max(2, size.x / 4), max(2, size.y / 4))
+		var column_top_left = center - column_size / 2
+		
+		# Place the column tiles
+		for x in range(column_top_left.x, column_top_left.x + column_size.x):
+			for y in range(column_top_left.y, column_top_left.y + column_size.y):
+				tilemap.set_cell(1, Vector2i(x, y), 1, Vector2i(0, 3), 0) # Wall tiles on layer 1
+				tilemap.set_cell(0, Vector2i(x, y), -1) # Clear floor tiles on layer 0
+	
+	print("Columns generated in rooms.")
 
 func add_to_graph(graph, room):
 	var id = graph.get_available_point_id()

@@ -7,13 +7,14 @@
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="5_5m8nb"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ogygc"]
-radius = 20.0
+radius = 15.0
 
 [node name="Node2D" type="Node2D"]
+rotation = -1.5708
 
 [node name="Player" type="CharacterBody2D" parent="."]
 script = ExtResource("1_feuro")
-move_speed = 150.0
+move_speed = 170.0
 
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Player"]
 remote_path = NodePath("../Camera2D")
@@ -31,6 +32,7 @@ texture = ExtResource("2_nkilj")
 shape = SubResource("CircleShape2D_ogygc")
 
 [node name="Health" parent="Player" instance=ExtResource("4_7t0nk")]
+max_health = 150
 
 [node name="Weapon" parent="Player" instance=ExtResource("5_5m8nb")]
 position = Vector2(33, 0)

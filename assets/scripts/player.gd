@@ -4,6 +4,7 @@ class_name Player
 @export var move_speed : float = 100
 var has_key = false
 var double_defense = false
+var god_mode = false
 
 @onready var bullet_manager = $"../BulletManager"
 @onready var weapon = $Weapon
@@ -47,40 +48,49 @@ func get_input():
 func _unhandled_input(event):
 	if event.is_action_released("shoot"):
 		weapon.shoot()
+	if event.is_action_released("god_mode"):
+		god_mode = true
+		print("god mode activated")
 
 func shoot(bullet_instance, location, direction):
 	emit_signal("player_fired_bullet", bullet_instance, location, direction)
 
 func handle_hit(damage):
+	if god_mode:
+		return
 	if double_defense:
 		health_stat.health -= damage / 2
 	else:
 		health_stat.health -= damage
 	print("player health: ", health_stat.health)
+	
+	if health_stat.health <= 0:
+		reset_current_scene()
 
 func pick_up_key():
 	has_key = true
 
 # One per level
-func pick_up_powerup():
+func pick_up_fire_rate():
 	weapon.set_cool_down(0.1)
 
 # Common
 func pick_up_health():
 	health_stat.health += 20
+	print("player health: ", health_stat.health)
 
 # About 3 per level
 func pick_up_health_container():
 	health_stat.max_health += 50
 
 # About 3 per level
-func pick_up_damage_boost():
-	# Increase shooting power for 30 seconds
-	pass
+#func pick_up_damage_boost():
+	## Increase shooting power for 30 seconds
+	#pass
 
 # One per level
 func pick_up_swift_boots():
-	move_speed += 20
+	move_speed += 80
 
 func unlock_door(door):
 	if has_key:

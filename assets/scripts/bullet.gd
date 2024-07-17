@@ -1,7 +1,7 @@
 extends Area2D
 
 @onready var kill_timer = $KillTimer
-@export var speed : int = 10
+@export var speed : int = 3
 @export var damage : int = 20
 
 var travel_direction = Vector2.ZERO

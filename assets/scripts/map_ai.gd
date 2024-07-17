@@ -13,19 +13,19 @@ func initialize(pathfinding: Pathfinding):
 
 func spawn_enemy_shooter(spawn_location: Vector2):
 	var shooter_instance = enemy_shooter.instantiate()
-	enemy_container.add_child(shooter_instance)
 	shooter_instance.global_position = spawn_location
+	enemy_container.add_child(shooter_instance)
 	shooter_instance.ai.pathfinding = pathfinding
 
 func spawn_enemy_turret(spawn_location: Vector2):
 	var turret_instance = enemy_turret.instantiate()
-	enemy_container.add_child(turret_instance)
 	turret_instance.global_position = spawn_location
+	enemy_container.add_child(turret_instance)
 
 func spawn_enemy_fighter(spawn_location: Vector2):
 	var fighter_instance = enemy_fighter.instantiate()
-	enemy_container.add_child(fighter_instance)
 	fighter_instance.global_position = spawn_location
+	enemy_container.add_child(fighter_instance)
 	fighter_instance.ai.pathfinding = pathfinding
 
 func spawn_gameplay_components():

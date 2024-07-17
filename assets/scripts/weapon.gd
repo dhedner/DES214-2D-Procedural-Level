@@ -10,8 +10,8 @@ var bullet = preload("res://assets/scenes/bullet.tscn")
 func shoot():
 	if cooldown.is_stopped() and bullet != null:
 		var bullet_instance = bullet.instantiate()
-		var target = get_global_mouse_position()
-		var direction = reticol.global_position.direction_to(target).normalized()
+		#var target = get_global_mouse_position()
+		var direction = (reticol.global_position - global_position).normalized()
 		emit_signal("weapon_fired", bullet_instance, reticol.global_position, direction)
 		cooldown.start()
 

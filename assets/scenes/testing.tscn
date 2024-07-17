@@ -82,6 +82,5 @@ layer_1/tile_data = PackedInt32Array(-131076, 1, 3, -65540, 1, 3, -4, 1, 3, 6553
 [node name="Pathfinding" type="Node2D" parent="."]
 script = ExtResource("6_jgyay")
 
-[node name="Shooter Enemy" parent="." node_paths=PackedStringArray("pathfinding") instance=ExtResource("6_pbhy3")]
-position = Vector2(352, -32)
-pathfinding = NodePath("../Pathfinding")
+[node name="Shooter Enemy" parent="." instance=ExtResource("6_pbhy3")]
+position = Vector2(336, 1)

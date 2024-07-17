@@ -1,17 +1,17 @@
-[gd_scene load_steps=4 format=3 uid="uid://csneqj2ujdwhm"]
+[gd_scene load_steps=4 format=3 uid="uid://dh65rc30hfv2f"]
 
-[ext_resource type="Script" path="res://assets/scripts/health_pickup.gd" id="1_47q6x"]
-[ext_resource type="Texture2D" uid="uid://d0ykcwa855gdd" path="res://assets/sprites/Heart.png" id="2_gdn1t"]
+[ext_resource type="Script" path="res://assets/scripts/heart_container.gd" id="1_wk777"]
+[ext_resource type="Texture2D" uid="uid://bgnv5ldl3swrc" path="res://assets/sprites/HeartContainer.png" id="2_g146d"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hcxxh"]
 
 [node name="Area2D" type="Area2D"]
-script = ExtResource("1_47q6x")
+script = ExtResource("1_wk777")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_hcxxh")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_gdn1t")
+texture = ExtResource("2_g146d")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

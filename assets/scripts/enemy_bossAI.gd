@@ -1,7 +1,7 @@
 extends Node2D
 
 signal state_changed(new_state)
-#signal enemy_fired_bullet(bullet, position, direction)
+signal enemy_fired_bullet(bullet, position, direction)
 
 enum State {
 	PATROL,
@@ -10,7 +10,7 @@ enum State {
 
 @onready var player_detection_zone = $PlayerDetectionZone
 @onready var patrol_timer = $PatrolTimer
-#@onready var bullet_manager = $"../BulletManager"
+@onready var bullet_manager = $"../BulletManager"
 
 var current_state: int = -1 : set = set_state
 var player = null
@@ -22,15 +22,15 @@ var pathfinding: Pathfinding
 func _ready():
 	actor = self.actor
 	set_state(State.PATROL)
-	#weapon.connect("weapon_fired", shoot)
-	#enemy_fired_bullet.connect(Callable(bullet_manager, "handle_bullet_spawned"))
+
+	enemy_fired_bullet.connect(Callable(bullet_manager, "handle_bullet_spawned"))
 
 func _physics_process(delta):
 	match current_state:
 		State.PATROL:
 			pass
 		State.ENGAGE:
-			if player != null:
+			if player != null and weapon != null:
 				actor.rotation = actor.global_position.direction_to(player.global_position).angle()
 				weapon.shoot()
 
@@ -39,6 +39,9 @@ func initialize(actor, weapon, pathfinding):
 	self.actor = actor
 	self.weapon = weapon
 	self.pathfinding = pathfinding
+	
+	weapon.connect("weapon_fired", shoot)
+	weapon.set_cool_down(1.0)
 
 func set_state(new_state: int):
 	if new_state == current_state:
@@ -50,8 +53,8 @@ func set_state(new_state: int):
 func set_weapon(weapon):
 	self.weapon = weapon
 
-#func shoot(bullet_instance, location, direction):
-	#emit_signal("enemy_fired_bullet", bullet_instance, location, direction)
+func shoot(bullet_instance, location, direction):
+	emit_signal("enemy_fired_bullet", bullet_instance, location, direction)
 
 func _on_player_detection_zone_body_entered(body):
 	var name = body.name

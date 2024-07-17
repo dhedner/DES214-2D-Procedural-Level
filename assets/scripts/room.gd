@@ -32,9 +32,9 @@ func _draw():
 		#draw_rect(room_rect, Color(0.2, 0.8, 0), false)
 	#else:
 		#draw_rect(room_rect, Color(0.2, 0.8, 0), false)
-	draw_rect(room_rect, Color(0.2, 0.8, 0), false)
-	draw_string(font, room_rect.position + Vector2(125,125), str(main_path_index), HORIZONTAL_ALIGNMENT_LEFT, -1, 100)
-	draw_string(font, room_rect.position + Vector2(250,125), str(distance_index), HORIZONTAL_ALIGNMENT_LEFT, -1, 100)
+	#draw_rect(room_rect, Color(0.2, 0.8, 0), false)
+	#draw_string(font, room_rect.position + Vector2(125,125), str(main_path_index), HORIZONTAL_ALIGNMENT_LEFT, -1, 100)
+	#draw_string(font, room_rect.position + Vector2(250,125), str(distance_index), HORIZONTAL_ALIGNMENT_LEFT, -1, 100)
 
 func _process(delta):
 	queue_redraw()

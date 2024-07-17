@@ -6,6 +6,7 @@
 script = ExtResource("1_8yarv")
 
 [node name="Reticol" type="Marker2D" parent="."]
+position = Vector2(2, 0)
 
 [node name="Cooldown" type="Timer" parent="."]
 wait_time = 0.2

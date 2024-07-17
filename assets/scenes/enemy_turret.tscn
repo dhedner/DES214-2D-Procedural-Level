@@ -1,7 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://cha8w0vfkicu8"]
+[gd_scene load_steps=10 format=3 uid="uid://cha8w0vfkicu8"]
 
 [ext_resource type="Script" path="res://assets/scripts/enemy.gd" id="1_ikw1o"]
 [ext_resource type="Texture2D" uid="uid://cjf62shv1c3gf" path="res://assets/sprites/Enemy.png" id="2_clmbh"]
+[ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="2_skd7x"]
 [ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="3_ahgte"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_p3p3q"]
 [ext_resource type="Script" path="res://assets/scripts/enemy_turretAI.gd" id="5_ovouv"]
@@ -11,10 +12,12 @@
 radius = 20.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_2qne8"]
-radius = 100.0
+radius = 200.0
 
 [node name="Turret Enemy" type="CharacterBody2D"]
+rotation = 1.5708
 script = ExtResource("1_ikw1o")
+item_scenes = Array[PackedScene]([ExtResource("2_skd7x")])
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 rotation = 1.5708

@@ -1,7 +1,7 @@
 extends StaticBody2D
 
 @export var item_scenes: Array[PackedScene] = []
-@export var drop_chance: float = 0.2
+@export var drop_chance: float = 0.4
 @export var health: int = 10
 
 func _ready():
