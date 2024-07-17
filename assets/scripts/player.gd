@@ -61,13 +61,31 @@ func handle_hit(damage):
 func pick_up_key():
 	has_key = true
 
+# One per level
 func pick_up_powerup():
-	double_defense = true
+	weapon.set_cool_down(0.1)
 
+# Common
 func pick_up_health():
 	health_stat.health += 20
+
+# About 3 per level
+func pick_up_health_container():
+	health_stat.max_health += 50
+
+# About 3 per level
+func pick_up_damage_boost():
+	# Increase shooting power for 30 seconds
+	pass
+
+# One per level
+func pick_up_swift_boots():
+	move_speed += 20
 
 func unlock_door(door):
 	if has_key:
 		door.unlock()
 		has_key = false
+
+func reset_current_scene():
+	get_tree().reload_current_scene()

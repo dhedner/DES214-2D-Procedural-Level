@@ -54,9 +54,10 @@ func _physics_process(delta):
 				weapon.shoot()
 
 # Pseudo constructor
-func initialize(actor, weapon):
+func initialize(actor, weapon, pathfinding):
 	self.actor = actor
 	self.weapon = weapon
+	self.pathfinding = pathfinding
 
 func set_state(new_state: int):
 	if new_state == current_state:

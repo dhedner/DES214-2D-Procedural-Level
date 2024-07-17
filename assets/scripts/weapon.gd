@@ -14,3 +14,6 @@ func shoot():
 		var direction = reticol.global_position.direction_to(target).normalized()
 		emit_signal("weapon_fired", bullet_instance, reticol.global_position, direction)
 		cooldown.start()
+
+func set_cool_down(time):
+	cooldown.set_wait_time(time)

@@ -47,6 +47,7 @@ func _physics_process(delta):
 	match current_state:
 		State.PATROL:
 			if not patrol_location_reached :
+				
 				var path = pathfinding.get_new_path(position, patrol_location)
 				if path.size() > 0:
 					target = path[0]

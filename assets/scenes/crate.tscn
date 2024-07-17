@@ -1,13 +1,17 @@
-[gd_scene load_steps=3 format=3 uid="uid://c4t8khbbd63mt"]
+[gd_scene load_steps=5 format=3 uid="uid://c4t8khbbd63mt"]
 
 [ext_resource type="Script" path="res://assets/scripts/crate.gd" id="1_frvc6"]
+[ext_resource type="Texture2D" uid="uid://d0ykcwa855gdd" path="res://assets/sprites/Heart.png" id="2_6mag2"]
+[ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="2_h6pxa"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hkxvc"]
 
 [node name="StaticBody2D" type="StaticBody2D"]
 script = ExtResource("1_frvc6")
+item_scenes = Array[PackedScene]([ExtResource("2_h6pxa")])
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_hkxvc")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_6mag2")

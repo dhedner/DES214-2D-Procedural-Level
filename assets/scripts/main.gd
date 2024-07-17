@@ -1,11 +1,13 @@
 extends Node2D
 
 var player = preload("res://assets/scenes/player.tscn")
+var boss = preload("res://assets/scenes/enemy_boss.tscn")
 var level_exit = preload("res://assets/scenes/level_exit.tscn")
 var locked_door = preload("res://assets/scenes/door.tscn")
 var key = preload("res://assets/scenes/key.tscn")
 var powerup = preload("res://assets/scenes/powerup.tscn")
 var health_pickup = preload("res://assets/scenes/health_pickup.tscn")
+var crate = preload("res://assets/scenes/crate.tscn")
 
 @onready var level_manager = $Level
 @onready var map_ai = $MapAI
@@ -52,15 +54,16 @@ var enemy_spawn_grammar = {
 
 func _ready():
 	randomize()
-	connect("level_exit_reached", exit_reached)
 
 	level_manager.reset_level(tilemap)
 	await get_tree().create_timer(1.1).timeout
 	pathfinding.create_navigation_map(tilemap)
 	map_ai.initialize(pathfinding)
+	var level_exit_instance = level_exit.instantiate()
 	
-	#spawn_player()
+	spawn_player()
 	spawn_enemies()
+	spawn_boss()
 	place_gameplay_components()
 
 func _draw():
@@ -96,6 +99,11 @@ func spawn_player():
 		level_manager.start_room.position.y - (level_manager.start_room.size[1] / 4))
 	debug_mode = false
 	$Camera2D.enabled = false
+
+func spawn_boss():
+	var boss_spawn = boss.instantiate()
+	add_child(boss_spawn)
+	boss_spawn.position = level_manager.end_room.position
 
 func exit_reached():
 	level_manager.reset_level(tilemap)
@@ -186,6 +194,7 @@ func place_gameplay_components():
 	var key_instance = key.instantiate()
 	key_room.add_child(key_instance)
 	key_instance.position = Vector2(0, 0)
+	leaf_node_rooms.erase(leaf_node_rooms.find(key_room))
 
 	# Place powerup in 3 random rooms
 	for i in range(3):
@@ -214,6 +223,20 @@ func place_gameplay_components():
 		health_pickup_room.add_child(health_pickup_instance)
 		health_pickup_instance.position = health_pickup_position
 		off_path_rooms.erase(off_path_rooms.find(health_pickup_room))
+	
+	# Place crates in 5 random rooms
+	for i in range(5):
+		var crate_room = off_path_rooms[randi() % off_path_rooms.size()]
+		
+		var crate_position = Vector2(
+			randf_range(-crate_room.size.x / 2, crate_room.size.x / 2),
+			randf_range(-crate_room.size.y / 2, crate_room.size.y / 2)
+		)
+		
+		var crate_instance = crate.instantiate()
+		crate_room.add_child(crate_instance)
+		crate_instance.position = crate_position
+		off_path_rooms.erase(off_path_rooms.find(crate_room))
 	
 	# Place level exit in the end room
 	var level_exit_instance = level_exit.instantiate()
