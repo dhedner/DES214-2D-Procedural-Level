@@ -15,10 +15,12 @@ var crate = preload("res://assets/scenes/crate.tscn")
 @onready var map_ai = $MapAI
 @onready var tilemap = $TileMap
 @onready var pathfinding = $Pathfinding
+@onready var gui = $GUI
 
 @onready var room_container = $Level/Rooms
 @onready var corridor_container = $Level/Corridors
 
+var player_instance = null
 var debug_mode = false
 var tutorial_room = null
 
@@ -96,20 +98,22 @@ func _input(event):
 			level_manager.generate_tiles()
 	
 	if event.is_action_pressed("reset"):
-		level_manager.reset_level()
-		pass
+		level_manager.reset_level(tilemap)
 	
 	if event.is_action_pressed("change_camera"):
-		pass
+		$Camera2D.enabled = !$Camera2D.enabled
+		var player_camera = player_instance.get_node("Player").get_node("Camera2D")
+		player_camera.enabled = !player_camera.enabled
 
 func spawn_player():
-	var player_spawn = player.instantiate()
-	add_child(player_spawn)
-	player_spawn.position = Vector2(
+	player_instance = player.instantiate()
+	add_child(player_instance)
+	player_instance.position = Vector2(
 		level_manager.start_room.position.x, 
 		level_manager.start_room.position.y - (level_manager.start_room.size[1] / 4))
 	debug_mode = false
 	$Camera2D.enabled = false
+	gui.set_player(player_instance.get_node("Player"))
 
 func spawn_boss():
 	var boss_spawn = boss.instantiate()

@@ -13,8 +13,8 @@ enum State {
 @onready var bullet_manager = $"../BulletManager"
 
 # Obtain from base enemy class
-@export var optimal_range: int = 2
-@export var movement_speed: int = 150
+@export var optimal_range: int = 1
+@export var movement_speed: int = 120
 
 var current_state: int = -1 : set = set_state
 var player = null
@@ -68,13 +68,13 @@ func _physics_process(delta):
 				if path.size() > 1:
 					var dist = actor.global_position.distance_to(player.global_position)
 					# If optimal range is not met, move towards player
-					if dist < min_optimal:
+					if dist > max_optimal:
 						target = path[1]
 						actor.velocity = actor.global_position.direction_to(target) * movement_speed
 						actor.rotation = lerp_angle(rotation, actor.velocity.angle(), 1.0)
 						actor.move_and_slide()
 					# If optimal range is exceeded by a certain amount, move away from player
-					elif dist > max_optimal:
+					elif dist < min_optimal:
 						target = path[1]
 						actor.velocity = actor.global_position.direction_to(target).rotated(deg_to_rad(180)) * movement_speed
 						actor.rotation = lerp_angle(actor.rotation, actor.global_position.direction_to(player.global_position).angle(), 1.0)
@@ -97,6 +97,7 @@ func initialize(actor, weapon, pathfinding):
 	
 	weapon.connect("weapon_fired", shoot)
 	weapon.set_cool_down(0.8)
+	self.actor._set_range(1.0)
 
 
 func set_state(new_state: int):

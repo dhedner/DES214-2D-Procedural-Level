@@ -10,6 +10,8 @@ var god_mode = false
 @onready var weapon = $Weapon
 @onready var health_stat = $Health
 
+signal player_health_changed(new_health)
+signal player_max_health_changed(new_max_health)
 signal player_fired_bullet(bullet, position, direction)
 
 func _ready():
@@ -63,6 +65,7 @@ func handle_hit(damage):
 	else:
 		health_stat.health -= damage
 	print("player health: ", health_stat.health)
+	emit_signal("player_health_changed", health_stat.health)
 	
 	if health_stat.health <= 0:
 		reset_current_scene()
@@ -78,10 +81,14 @@ func pick_up_fire_rate():
 func pick_up_health():
 	health_stat.health += 20
 	print("player health: ", health_stat.health)
+	emit_signal("player_health_changed", health_stat.health)
 
 # About 3 per level
 func pick_up_health_container():
 	health_stat.max_health += 50
+	health_stat.health = health_stat.max_health
+	emit_signal("player_max_health_changed", health_stat.max_health)
+	emit_signal("player_health_changed", health_stat.health)
 
 # About 3 per level
 #func pick_up_damage_boost():

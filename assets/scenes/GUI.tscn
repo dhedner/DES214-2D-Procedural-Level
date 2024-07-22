@@ -1,7 +1,59 @@
-[gd_scene format=3 uid="uid://earqvxrd27ue"]
+[gd_scene load_steps=4 format=3 uid="uid://earqvxrd27ue"]
+
+[ext_resource type="Script" path="res://assets/scripts/GUI.gd" id="1_66723"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bvwgu"]
+bg_color = Color(0.192157, 0.0705882, 0.0588235, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0475577, 0.0475577, 0.0475576, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8hoyt"]
+bg_color = Color(0.862745, 0.160784, 0.133333, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0470588, 0.0470588, 0.0470588, 1)
 
 [node name="GUI" type="CanvasLayer"]
+script = ExtResource("1_66723")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="Bars" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="TopRow" type="HBoxContainer" parent="MarginContainer/Bars"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HealthBar" type="ProgressBar" parent="MarginContainer/Bars/TopRow"]
+custom_minimum_size = Vector2(300, 30)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bvwgu")
+theme_override_styles/fill = SubResource("StyleBoxFlat_8hoyt")
+value = 100.0
+show_percentage = false
+
+[node name="MiddleRow" type="HBoxContainer" parent="MarginContainer/Bars"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 4.0
+
+[node name="BottomRow" type="HBoxContainer" parent="MarginContainer/Bars"]
+layout_mode = 2
+size_flags_vertical = 3
