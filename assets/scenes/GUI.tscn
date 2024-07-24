@@ -1,6 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://earqvxrd27ue"]
+[gd_scene load_steps=6 format=3 uid="uid://earqvxrd27ue"]
 
 [ext_resource type="Script" path="res://assets/scripts/GUI.gd" id="1_66723"]
+[ext_resource type="Texture2D" uid="uid://8drud52rl6vw" path="res://assets/sprites/Key.png" id="2_nnitl"]
+[ext_resource type="FontFile" uid="uid://6vosinleacei" path="res://assets/fonts/LiberationSans.ttf" id="3_fhfa1"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bvwgu"]
 bg_color = Color(0.192157, 0.0705882, 0.0588235, 1)
@@ -57,3 +59,17 @@ size_flags_stretch_ratio = 4.0
 [node name="BottomRow" type="HBoxContainer" parent="MarginContainer/Bars"]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="KeyIcon" type="TextureRect" parent="MarginContainer/Bars/BottomRow"]
+layout_mode = 2
+texture = ExtResource("2_nnitl")
+stretch_mode = 3
+
+[node name="KeyCount" type="Label" parent="MarginContainer/Bars/BottomRow"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_fonts/font = ExtResource("3_fhfa1")
+theme_override_font_sizes/font_size = 40
+text = "0"
+vertical_alignment = 1

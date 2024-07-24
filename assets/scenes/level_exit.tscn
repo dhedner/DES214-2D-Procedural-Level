@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://dem64yabda4mb"]
 
 [ext_resource type="Script" path="res://assets/scripts/level_exit.gd" id="1_qwnk8"]
-[ext_resource type="Texture2D" uid="uid://wrdnbvo0g7ai" path="res://assets/sprites/PowerIcon.png" id="2_b0xwd"]
+[ext_resource type="Texture2D" uid="uid://bh7q7nglw35hj" path="res://assets/sprites/Treasure.png" id="2_vlo43"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_p3st1"]
 
@@ -12,6 +12,6 @@ script = ExtResource("1_qwnk8")
 shape = SubResource("CircleShape2D_p3st1")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_b0xwd")
+texture = ExtResource("2_vlo43")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

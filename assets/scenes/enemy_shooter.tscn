@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://bp5u7kx4c12gd"]
+[gd_scene load_steps=13 format=3 uid="uid://bp5u7kx4c12gd"]
 
 [ext_resource type="Script" path="res://assets/scripts/enemy.gd" id="1_uxkha"]
 [ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="2_ntgsj"]
 [ext_resource type="Texture2D" uid="uid://cdx5c24c3qnsr" path="res://assets/sprites/ToughEnemy.png" id="2_tontx"]
 [ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="3_tpekm"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_a33xf"]
+[ext_resource type="Script" path="res://assets/scenes/enemy_healthbar.gd" id="4_tbln1"]
 [ext_resource type="Script" path="res://assets/scripts/enemy_shooterAI.gd" id="5_glbcv"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_4xmcy"]
 
@@ -12,7 +13,23 @@
 radius = 8.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_2qne8"]
-radius = 150.0
+radius = 160.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ats67"]
+bg_color = Color(0.192157, 0.0705882, 0.0588235, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0475577, 0.0475577, 0.0475576, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6emjf"]
+bg_color = Color(0.862745, 0.160784, 0.133333, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0470588, 0.0470588, 0.0470588, 1)
 
 [node name="Shooter Enemy" type="CharacterBody2D"]
 rotation = 1.5708
@@ -45,6 +62,24 @@ wait_time = 3.0
 
 [node name="BulletManager" type="Node2D" parent="."]
 script = ExtResource("6_4xmcy")
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+custom_minimum_size = Vector2(100, 15)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -50.0
+offset_top = 50.0
+offset_right = 50.0
+offset_bottom = 65.0
+grow_horizontal = 2
+rotation = -1.5708
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_ats67")
+theme_override_styles/fill = SubResource("StyleBoxFlat_6emjf")
+value = 100.0
+show_percentage = false
+script = ExtResource("4_tbln1")
 
 [connection signal="body_entered" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_entered"]
 [connection signal="body_exited" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_exited"]

@@ -13,8 +13,8 @@ enum State {
 @onready var bullet_manager = $"../BulletManager"
 
 # Obtain from base enemy class
-@export var optimal_range: int = 3
-@export var movement_speed: int = 100
+@export var optimal_range: int = 50
+@export var movement_speed: int = 120
 
 var current_state: int = -1 : set = set_state
 var player = null
@@ -96,7 +96,8 @@ func initialize(actor, weapon, pathfinding):
 	set_state(State.PATROL)
 	
 	weapon.connect("weapon_fired", shoot)
-	weapon.set_cool_down(1.0)
+	weapon.set_cool_down(0.8)
+	self.actor._set_range(3.0)
 
 
 func set_state(new_state: int):

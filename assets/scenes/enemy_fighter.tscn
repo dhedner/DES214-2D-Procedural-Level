@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://d21l4ym332shf"]
+[gd_scene load_steps=14 format=3 uid="uid://d21l4ym332shf"]
 
 [ext_resource type="Script" path="res://assets/scripts/enemy.gd" id="1_2bclh"]
 [ext_resource type="PackedScene" uid="uid://dh65rc30hfv2f" path="res://assets/scenes/heart_container.tscn" id="2_52qht"]
@@ -7,7 +7,24 @@
 [ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="3_y58eu"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_pgkji"]
 [ext_resource type="Script" path="res://assets/scripts/enemy_fighterAI.gd" id="5_6qe3f"]
+[ext_resource type="Script" path="res://assets/scenes/enemy_healthbar.gd" id="5_t12dg"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_n5c04"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eg66q"]
+bg_color = Color(0.192157, 0.0705882, 0.0588235, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0475577, 0.0475577, 0.0475576, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3uo2m"]
+bg_color = Color(0.862745, 0.160784, 0.133333, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0470588, 0.0470588, 0.0470588, 1)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_sm8x5"]
 radius = 20.0
@@ -25,6 +42,24 @@ move_speed = 120.0
 rotation = 1.5708
 scale = Vector2(0.7, 0.7)
 texture = ExtResource("2_ejo28")
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+custom_minimum_size = Vector2(100, 15)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -50.0
+offset_top = 50.0
+offset_right = 50.0
+offset_bottom = 65.0
+grow_horizontal = 2
+rotation = -1.5708
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_eg66q")
+theme_override_styles/fill = SubResource("StyleBoxFlat_3uo2m")
+value = 100.0
+show_percentage = false
+script = ExtResource("5_t12dg")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_sm8x5")

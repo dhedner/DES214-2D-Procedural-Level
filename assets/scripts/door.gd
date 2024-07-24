@@ -13,7 +13,8 @@ extends Area2D
 
 func _on_body_entered(body):
 	if body.name == "Player" and is_locked and body.has_key:
-		unlock()
+		body.unlock_door(self)
+		body.has_key = false
 
 func unlock():
 	is_locked = false

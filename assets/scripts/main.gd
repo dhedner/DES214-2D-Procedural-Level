@@ -263,8 +263,8 @@ func place_gameplay_components():
 		crate_room.add_child(crate_instance)
 		crate_instance.position = crate_position
 
-	
-	# Place level exit in the end room
-	#var level_exit_instance = level_exit.instantiate()
-	#level_manager.end_room.add_child(level_exit_instance)
-	#level_exit_instance.position = Vector2(0, 0)
+# When an arena room is cleared, spawn a health pickup
+func on_arena_cleared(room):
+	var heart_container_instance = heart_container.instantiate()
+	room.add_child(heart_container_instance)
+	heart_container_instance.position = Vector2(0, 0)

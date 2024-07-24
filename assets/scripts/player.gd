@@ -13,6 +13,8 @@ var god_mode = false
 signal player_health_changed(new_health)
 signal player_max_health_changed(new_max_health)
 signal player_fired_bullet(bullet, position, direction)
+signal player_picked_up_key(has_key)
+signal player_used_key(has_key)
 
 func _ready():
 	weapon.connect("weapon_fired", shoot)
@@ -72,6 +74,7 @@ func handle_hit(damage):
 
 func pick_up_key():
 	has_key = true
+	emit_signal("player_picked_up_key", has_key)
 
 # One per level
 func pick_up_fire_rate():
@@ -90,11 +93,6 @@ func pick_up_health_container():
 	emit_signal("player_max_health_changed", health_stat.max_health)
 	emit_signal("player_health_changed", health_stat.health)
 
-# About 3 per level
-#func pick_up_damage_boost():
-	## Increase shooting power for 30 seconds
-	#pass
-
 # One per level
 func pick_up_swift_boots():
 	move_speed += 80
@@ -103,6 +101,7 @@ func unlock_door(door):
 	if has_key:
 		door.unlock()
 		has_key = false
+		emit_signal("player_used_key", has_key)
 
 func reset_current_scene():
 	get_tree().reload_current_scene()
