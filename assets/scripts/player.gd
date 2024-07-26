@@ -53,8 +53,8 @@ func _unhandled_input(event):
 	if event.is_action_released("shoot"):
 		weapon.shoot()
 	if event.is_action_released("god_mode"):
-		god_mode = true
-		print("god mode activated")
+		god_mode = !god_mode
+		print("god mode toggled")
 
 func shoot(bullet_instance, location, direction):
 	emit_signal("player_fired_bullet", bullet_instance, location, direction)

@@ -98,7 +98,7 @@ func _input(event):
 			level_manager.generate_tiles()
 	
 	if event.is_action_pressed("reset"):
-		level_manager.reset_level(tilemap)
+		get_tree().reload_current_scene()
 	
 	if event.is_action_pressed("change_camera"):
 		$Camera2D.enabled = !$Camera2D.enabled

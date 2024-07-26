@@ -9,8 +9,8 @@ var corridor = preload("res://assets/scenes/corridor.tscn")
 @export var num_rooms = 20
 @export var min_size = 6
 @export var max_size = 11
-@export var x_bias = 200
-@export var y_bias = 300
+@export var x_bias = 100
+@export var y_bias = 200
 @export var path_cycles = 1
 
 var path : AStar2D # Graph that contains all the rooms and their corridors
