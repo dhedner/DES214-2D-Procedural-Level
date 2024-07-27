@@ -1,17 +1,19 @@
 extends ProgressBar
 
-@onready var enemy = $".."
+@onready var enemy = $"../CharacterBody2D"
+@onready var health = $"../Health"
 
 func _ready():
-	#set_new_health_value(enemy.health_stat.max_health)
+	set_new_health_value(health.max_health)
 	enemy.connect("enemy_health_changed", set_new_health_value)
 
-#func set_enemy(enemy: Enemy):
-	#self.enemy = enemy
-	#
-	#set_new_health_value(enemy.health_stat.max_health)
-#
-	#enemy.connect("enemy_health_changed", set_new_health_value)
+func _process(delta):
+	global_position = enemy.global_position + Vector2(-50, -50)
+
+func set_enemy(enemy: Enemy):
+	self.enemy = enemy
+	set_new_health_value(enemy.health_stat.max_health)
+	enemy.connect("enemy_health_changed", set_new_health_value)
 
 func set_new_health_value(new_health: int):
 	var bar_style = self.get("theme_override_styles/fill")

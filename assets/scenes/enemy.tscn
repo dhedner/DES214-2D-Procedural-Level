@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=3 uid="uid://6biqldqluklg"]
+
+[ext_resource type="Script" path="res://assets/scripts/enemy.gd" id="1_aknsn"]
+[ext_resource type="Texture2D" uid="uid://cjf62shv1c3gf" path="res://assets/sprites/Enemy.png" id="1_q517i"]
+[ext_resource type="Script" path="res://assets/scripts/enemy_healthbar.gd" id="2_c2pif"]
+[ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="3_ji84n"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lh7ym"]
+radius = 20.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4hjin"]
+bg_color = Color(0.192157, 0.0705882, 0.0588235, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0475577, 0.0475577, 0.0475576, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xltl3"]
+bg_color = Color(0.862745, 0.160784, 0.133333, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0470588, 0.0470588, 0.0470588, 1)
+
+[node name="Enemy" type="Node2D"]
+script = ExtResource("1_aknsn")
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
+shape = SubResource("CircleShape2D_lh7ym")
+
+[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D"]
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("1_q517i")
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+custom_minimum_size = Vector2(100, 15)
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = -35.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_4hjin")
+theme_override_styles/fill = SubResource("StyleBoxFlat_xltl3")
+value = 100.0
+show_percentage = false
+script = ExtResource("2_c2pif")
+
+[node name="Health" parent="." instance=ExtResource("3_ji84n")]
+health = 100
