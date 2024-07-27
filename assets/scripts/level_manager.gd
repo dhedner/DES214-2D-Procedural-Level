@@ -3,8 +3,6 @@ extends Node2D
 var room_scene = preload("res://assets/scenes/room.tscn")
 var corridor = preload("res://assets/scenes/corridor.tscn")
 
-#@onready var tilemap = $TileMap
-
 @export var tile_size = 32
 @export var num_rooms = 20
 @export var min_size = 6
@@ -12,6 +10,8 @@ var corridor = preload("res://assets/scenes/corridor.tscn")
 @export var x_bias = 100
 @export var y_bias = 200
 @export var path_cycles = 1
+
+@onready var tilemap : TileMap = $"../TileMap"
 
 var path : AStar2D # Graph that contains all the rooms and their corridors
 var graph_id_to_room
@@ -21,10 +21,13 @@ var end_room = null
 
 signal load_complete
 
-func reset_level(tilemap: TileMap):
-	clear_map(tilemap)
-	await make_rooms(tilemap)
+func _ready():	
+	while not await make_rooms(tilemap):
+		clear_map(tilemap)
+
 	generate_tiles(tilemap)
+
+	emit_signal("load_complete")
 
 func clear_map(tilemap: TileMap):
 	tilemap.clear()
@@ -59,15 +62,19 @@ func make_rooms(tilemap: TileMap):
 	create_corridors_from_graph()
 	find_main_path()
 	create_cycles()
-	await check_room_distribution(tilemap, full_map)
+	var is_good = check_room_distribution(tilemap, full_map)
+	if not is_good:
+		return false
+
 	assign_distance_index()
 	
-	emit_signal("load_complete")
+	return true
 
 func check_room_distribution(tilemap: TileMap, map_size):
 	if ((map_size.size.x / 2) > map_size.size.y) or ((map_size.size.y / 2) > map_size.size.x):
 		print("Undesirable map size: ", map_size.size)
-		await reset_level(tilemap)
+		return false
+	return true
 
 # Change to use various layers of the same tile map (0 for floor)
 func generate_tiles(tilemap: TileMap):

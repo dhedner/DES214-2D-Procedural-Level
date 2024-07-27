@@ -43,6 +43,7 @@ func generate_corridor_tiles(tilemap, path):
 		tilemap.set_cell(1, Vector2i(x, x_over_y.y), -1)
 		tilemap.set_cell(0, Vector2i(x, x_over_y.y + difference_y), 1, Vector2i(1, 1), 0);
 		tilemap.set_cell(1, Vector2i(x, x_over_y.y + difference_y), -1)
+
 	for y in range(starting_point.y, ending_point.y, difference_y):
 		tilemap.set_cell(0, Vector2i(y_over_x.x, y), 1, Vector2i(1, 1), 0);
 		tilemap.set_cell(1, Vector2i(y_over_x.x, y), -1)
