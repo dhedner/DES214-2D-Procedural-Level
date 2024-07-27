@@ -64,20 +64,11 @@ func _ready():
 
 	pathfinding.create_navigation_map(tilemap)
 	map_ai.initialize(pathfinding)
-	var level_exit_instance = level_exit.instantiate()
 	
 	spawn_player()
-	spawn_enemies()
-	spawn_boss()
-	place_gameplay_components()
-	
-	var turret_position = Vector2(
-		randf_range(-tutorial_room.size.x / 2, tutorial_room.size.x / 2),
-		randf_range(-tutorial_room.size.y / 2, tutorial_room.size.y / 2)
-	)
-	
-	var turret_instance = map_ai.spawn_enemy_turret(tutorial_room.position)
-	tutorial_room.add_child(turret_instance)
+	# spawn_enemies()
+	# spawn_boss()
+	# place_gameplay_components()
 
 func _draw():
 	queue_redraw()
@@ -136,6 +127,9 @@ func spawn_enemies():
 	for room in eligible_rooms:
 		var rule = determine_enemy_rule(room)
 		spawn_enemies_in_room(room, rule)
+	
+	var turret_instance = map_ai.spawn_enemy_turret(tutorial_room.position)
+	tutorial_room.add_child(turret_instance)
 
 # Function to determine which enemy rule to apply to a room
 func determine_enemy_rule(room):
@@ -171,7 +165,6 @@ func spawn_enemies_in_room(room, rule):
 			var enemy_type = enemy_definition.type
 			var enemy_count = enemy_definition.get("count", 0)
 			for i in range(enemy_count):
-				var enemy_instance = null
 				var enemy_position = Vector2(
 					randf_range(-room.size.x / 2, room.size.x / 2),
 					randf_range(-room.size.y / 2, room.size.y / 2)
