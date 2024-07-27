@@ -5,9 +5,9 @@
 [ext_resource type="Texture2D" uid="uid://cdx5c24c3qnsr" path="res://assets/sprites/ToughEnemy.png" id="2_tontx"]
 [ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="3_tpekm"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_a33xf"]
-[ext_resource type="Script" path="res://assets/scenes/enemy_healthbar.gd" id="4_tbln1"]
 [ext_resource type="Script" path="res://assets/scripts/enemy_shooterAI.gd" id="5_glbcv"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_4xmcy"]
+[ext_resource type="Script" path="res://assets/scripts/enemy_healthbar.gd" id="8_skxbw"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_sm8x5"]
 radius = 8.0
@@ -79,7 +79,7 @@ theme_override_styles/background = SubResource("StyleBoxFlat_ats67")
 theme_override_styles/fill = SubResource("StyleBoxFlat_6emjf")
 value = 100.0
 show_percentage = false
-script = ExtResource("4_tbln1")
+script = ExtResource("8_skxbw")
 
 [connection signal="body_entered" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_entered"]
 [connection signal="body_exited" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_exited"]

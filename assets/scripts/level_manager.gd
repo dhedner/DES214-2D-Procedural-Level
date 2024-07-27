@@ -19,6 +19,8 @@ var debug_mode = false
 var start_room = null
 var end_room = null
 
+signal load_complete
+
 func reset_level(tilemap: TileMap):
 	clear_map(tilemap)
 	await make_rooms(tilemap)
@@ -60,6 +62,8 @@ func make_rooms(tilemap: TileMap):
 	create_cycles()
 	check_room_distribution(tilemap, full_map)
 	assign_distance_index()
+	
+	emit_signal("load_complete")
 
 func check_room_distribution(tilemap: TileMap, map_size):
 	if ((map_size.size.x / 2) > map_size.size.y) or ((map_size.size.y / 2) > map_size.size.x):

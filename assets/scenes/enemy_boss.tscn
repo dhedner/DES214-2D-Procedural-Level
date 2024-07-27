@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dem64yabda4mb" path="res://assets/scenes/level_exit.tscn" id="2_wlbbi"]
 [ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="3_xiglw"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_0jkjl"]
-[ext_resource type="Script" path="res://assets/scenes/enemy_healthbar.gd" id="4_mmymn"]
+[ext_resource type="Script" path="res://assets/scripts/enemy_healthbar.gd" id="4_kptbd"]
 [ext_resource type="Script" path="res://assets/scripts/enemy_bossAI.gd" id="5_afyrw"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_pp5wo"]
 
@@ -54,7 +54,7 @@ theme_override_styles/background = SubResource("StyleBoxFlat_yhjks")
 theme_override_styles/fill = SubResource("StyleBoxFlat_oym1v")
 value = 100.0
 show_percentage = false
-script = ExtResource("4_mmymn")
+script = ExtResource("4_kptbd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_sm8x5")

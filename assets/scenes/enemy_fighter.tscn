@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="3_y58eu"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_pgkji"]
 [ext_resource type="Script" path="res://assets/scripts/enemy_fighterAI.gd" id="5_6qe3f"]
-[ext_resource type="Script" path="res://assets/scenes/enemy_healthbar.gd" id="5_t12dg"]
+[ext_resource type="Script" path="res://assets/scripts/enemy_healthbar.gd" id="5_t12dg"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_n5c04"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eg66q"]

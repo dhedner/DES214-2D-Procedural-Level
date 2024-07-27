@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Globalsignals="*res://assets/globals/globalsignals.gd"
+SceneLoader="*res://assets/globals/scene_loader.gd"
 
 [display]
 

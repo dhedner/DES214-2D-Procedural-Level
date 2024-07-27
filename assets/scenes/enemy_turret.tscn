@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cjf62shv1c3gf" path="res://assets/sprites/Enemy.png" id="2_clmbh"]
 [ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="2_skd7x"]
 [ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="3_ahgte"]
-[ext_resource type="Script" path="res://assets/scenes/enemy_healthbar.gd" id="4_72ae6"]
+[ext_resource type="Script" path="res://assets/scripts/enemy_healthbar.gd" id="4_72ae6"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_p3p3q"]
 [ext_resource type="Script" path="res://assets/scripts/enemy_turretAI.gd" id="5_ovouv"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_ncx3v"]
