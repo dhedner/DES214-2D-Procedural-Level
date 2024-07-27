@@ -60,8 +60,8 @@ var enemy_spawn_grammar = {
 func _ready():
 	randomize()
 
-	level_manager.reset_level(tilemap)
-	await get_tree().create_timer(1.1).timeout
+	await level_manager.load_complete
+
 	pathfinding.create_navigation_map(tilemap)
 	map_ai.initialize(pathfinding)
 	var level_exit_instance = level_exit.instantiate()
@@ -91,7 +91,7 @@ func _input(event):
 				$Camera2D.enabled = true
 			level_manager.make_rooms()
 		#else:
-			#reset_level()
+			#make_level()
 	
 	if event.is_action_pressed("ui_focus_next"):
 		if debug_mode:
@@ -121,7 +121,7 @@ func spawn_boss():
 	boss_spawn.position = level_manager.end_room.position
 
 func exit_reached():
-	level_manager.reset_level(tilemap)
+	level_manager.make_level(tilemap)
 
 func spawn_enemies():
 	var eligible_rooms = []

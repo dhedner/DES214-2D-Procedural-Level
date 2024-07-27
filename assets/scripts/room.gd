@@ -11,6 +11,24 @@ var graph_id
 var corridor_count = 0
 var is_on_main_path = false
 var is_arena = false
+	
+# Change to use various layers of the same tile map (0 for floor)
+func generate_room_tiles(tilemap: TileMap):
+	var room_size_in_tiles = (size / tilemap.tile_set.tile_size.x).floor()
+	room_size_in_tiles = Vector2i(room_size_in_tiles.x, room_size_in_tiles.y)
+	var room_position_in_tiles = tilemap.local_to_map(position)
+	var room_top_left = room_position_in_tiles - room_size_in_tiles / 2
+	for x in range(room_size_in_tiles.x):
+		for y in range(room_size_in_tiles.y):
+			var tile_position = Vector2i(x, y) + room_top_left
+
+			# Set floor tiles for layer 0
+			tilemap.set_cell(0, tile_position, 1, Vector2i(1, 1), 0)
+
+			# Clear wall tiles for layer 1
+			tilemap.set_cell(1, tile_position, -1)
+
+			# print("roomid=", graph_id, " floor=", tile_position)
 
 func make_room(_position, _size):
 	position = _position
@@ -19,22 +37,3 @@ func make_room(_position, _size):
 	new_shape.custom_solver_bias = 0.75 # Make the rooms settle quicker
 	new_shape.extents = size
 	$CollisionShape2D.shape = new_shape
-
-func _draw():
-	#pass
-	#var room_rect = Rect2(position - size, size * 2)
-	var room_rect = Rect2(-size, size * 2)	
-	#if is_start:
-		#draw_rect(room_rect, Color(0.0, 0.2, 0.8), true)
-	#elif is_end:
-		#draw_rect(room_rect, Color(0.8, 0.2, 0), true)
-	#elif main_path_index == -1:
-		#draw_rect(room_rect, Color(0.2, 0.8, 0), false)
-	#else:
-		#draw_rect(room_rect, Color(0.2, 0.8, 0), false)
-	#draw_rect(room_rect, Color(0.2, 0.8, 0), false)
-	#draw_string(font, room_rect.position + Vector2(125,125), str(main_path_index), HORIZONTAL_ALIGNMENT_LEFT, -1, 100)
-	#draw_string(font, room_rect.position + Vector2(250,125), str(distance_index), HORIZONTAL_ALIGNMENT_LEFT, -1, 100)
-
-func _process(delta):
-	queue_redraw()
