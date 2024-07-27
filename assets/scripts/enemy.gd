@@ -2,8 +2,6 @@ extends Node2D
 class_name Enemy
 
 @onready var health_stat = $Health
-@onready var weapon = $Weapon
-@onready var bullet_manager = $BulletManager
 @onready var healthbar = $HealthBar
 
 @export var pathfinding: Pathfinding

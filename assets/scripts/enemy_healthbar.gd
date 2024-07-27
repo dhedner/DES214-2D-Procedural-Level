@@ -1,6 +1,6 @@
 extends ProgressBar
 
-@onready var enemy = $"../CharacterBody2D"
+@onready var enemy = $".."
 @onready var health = $"../Health"
 
 func _ready():

@@ -7,6 +7,9 @@ var bullet = preload("res://assets/scenes/bullet.tscn")
 @onready var reticol = $Reticol
 @onready var cooldown = $Cooldown
 
+func _ready():
+	pass
+
 func shoot():
 	if cooldown.is_stopped() and bullet != null:
 		var bullet_instance = bullet.instantiate()

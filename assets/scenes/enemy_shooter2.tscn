@@ -10,10 +10,17 @@ radius = 160.0
 
 [node name="Enemy" instance=ExtResource("1_gbvye")]
 
+[node name="Weapon" parent="CharacterBody2D" index="2" instance=ExtResource("3_p67sh")]
+position = Vector2(33, 0)
+
+[node name="BulletManager" type="Node2D" parent="CharacterBody2D" index="3"]
+script = ExtResource("4_ipode")
+
 [node name="AI" type="Node2D" parent="." index="3"]
 script = ExtResource("2_s5ams")
-optimal_range = 50
+optimal_range = 200
 movement_speed = 120
+weapon_cooldown = 0.8
 
 [node name="PlayerDetectionZone" type="Area2D" parent="AI" index="0"]
 
@@ -22,12 +29,6 @@ shape = SubResource("CircleShape2D_5tg4p")
 
 [node name="PatrolTimer" type="Timer" parent="AI" index="1"]
 wait_time = 3.0
-
-[node name="Weapon" parent="." index="4" instance=ExtResource("3_p67sh")]
-position = Vector2(33, 0)
-
-[node name="BulletManager" type="Node2D" parent="." index="5"]
-script = ExtResource("4_ipode")
 
 [connection signal="body_entered" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_entered"]
 [connection signal="body_exited" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_exited"]
