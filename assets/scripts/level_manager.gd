@@ -36,8 +36,6 @@ func clear_map(tilemap: TileMap):
 		c.queue_free()
 	
 	path = null
-	
-	
 
 func make_rooms(tilemap: TileMap):
 	generate_diverse_rooms()
@@ -56,7 +54,7 @@ func make_rooms(tilemap: TileMap):
 		full_map = full_map.merge(rectangle)
 	
 	# Generate a minimum spanning tree
-	await build_graph()
+	build_graph()
 	create_corridors_from_graph()
 	find_main_path()
 	create_cycles()
@@ -76,7 +74,7 @@ func generate_tiles(tilemap: TileMap):
 	
 	if path == null:
 		await get_tree().process_frame
-	
+
 	# Fill entire map with wall tiles
 	var full_rect = Rect2()
 	for room in $Rooms.get_children():

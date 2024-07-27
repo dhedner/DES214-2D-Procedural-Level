@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://b0cq6jn6n8b5j"]
+
+[ext_resource type="PackedScene" uid="uid://cvetfippmsxli" path="res://assets/scenes/main.tscn" id="1_ewsu0"]
+
+[node name="Main" instance=ExtResource("1_ewsu0")]
+
+[node name="Level" parent="." index="2"]
+num_rooms = 3
+x_bias = 0
+y_bias = 0
+path_cycles = 0
