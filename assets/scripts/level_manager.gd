@@ -5,11 +5,12 @@ var corridor = preload("res://assets/scenes/corridor.tscn")
 
 @export var tile_size = 32
 @export var num_rooms = 20
-@export var min_size = 6
-@export var max_size = 11
+@export var min_size = 7
+@export var max_size = 15
 @export var x_bias = 100
 @export var y_bias = 200
 @export var path_cycles = 1
+@export var column_probability = 0.5
 
 @onready var tilemap : TileMap = $"../TileMap"
 
@@ -67,6 +68,10 @@ func make_rooms(tilemap: TileMap):
 		return false
 
 	assign_distance_index()
+
+	# Add room-specific objects
+	for room in $Rooms.get_children():
+		room.add_room_objects(self, tilemap)
 	
 	return true
 
@@ -97,6 +102,7 @@ func generate_tiles(tilemap: TileMap):
 		for y in range (top_left.y, bottom_right.y):
 			# Set all tiles on layer 1 to walls
 			tilemap.set_cell(1, Vector2i(x, y), 1, Vector2i(0, 3), 0)
+
 	print("Wall tiles placed.")
 	
 	# Carve out rooms
@@ -108,34 +114,6 @@ func generate_tiles(tilemap: TileMap):
 		c.generate_corridor_tiles(tilemap, path)
 
 	print("Rooms and corridors carved.")
-
-func generate_columns(tilemap: TileMap, num_columns: int):
-	var rooms = $Rooms.get_children()
-	var valid_rooms = []
-	
-	# Filter out rooms that are too small to have columns
-	for room in rooms:
-		var size = (room.size / tile_size).floor()
-		if size.x >= min_size + 2 and size.y >= min_size + 2 and not room.is_arena:
-			valid_rooms.append(room)
-	
-	# Randomly select rooms to have columns
-	for i in range(min(num_columns, valid_rooms.size())):
-		var room = valid_rooms[randi() % valid_rooms.size()]
-		var size = (room.size / tile_size).floor()
-		var center = tilemap.local_to_map(room.position)
-		
-		# Determine column size (example: based on room size)
-		var column_size = Vector2(max(2, size.x / 4), max(2, size.y / 4))
-		var column_top_left = center - column_size / 2
-		
-		# Place the column tiles
-		for x in range(column_top_left.x, column_top_left.x + column_size.x):
-			for y in range(column_top_left.y, column_top_left.y + column_size.y):
-				tilemap.set_cell(1, Vector2i(x, y), 1, Vector2i(0, 3), 0) # Wall tiles on layer 1
-				tilemap.set_cell(0, Vector2i(x, y), -1) # Clear floor tiles on layer 0
-	
-	print("Columns generated in rooms.")
 
 func add_to_graph(graph, room):
 	var id = graph.get_available_point_id()
@@ -384,11 +362,11 @@ func create_corridor(start_position, end_position):
 	new_corridor.make_corridor(start_position, end_position)
 	$Corridors.add_child(new_corridor)
 
-func explore_distances(start_room):
+func explore_distances(origin_room):
 	var visited = {}
 	var queue = []
 
-	queue.append([0, start_room.graph_id])
+	queue.append([0, origin_room.graph_id])
 
 	while queue.size() > 0:
 		var current = queue.pop_front()
