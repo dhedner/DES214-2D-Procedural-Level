@@ -21,8 +21,5 @@ theme_override_constants/margin_top = 40
 theme_override_constants/margin_right = 40
 theme_override_constants/margin_bottom = 40
 
-[node name="ProgressBar" type="ProgressBar" parent="."]
-offset_left = 40.0
-offset_top = 1013.0
-offset_right = 1880.0
-offset_bottom = 1040.0
+[node name="ProgressBar" type="ProgressBar" parent="PanelContainer/MarginContainer"]
+layout_mode = 2

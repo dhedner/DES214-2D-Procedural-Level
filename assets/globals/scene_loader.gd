@@ -31,7 +31,7 @@ func _process(delta):
 	var status = ResourceLoader.load_threaded_get_status(scene_file_path, progress)
 
 	if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-		var progress_bar = loading_screen_scene_instance.find_node("ProgressBar")
+		var progress_bar = loading_screen_scene_instance.get_node("PanelContainer/MarginContainer/ProgressBar")
 		progress_bar.value = progress[0] * 100
 	elif status == ResourceLoader.THREAD_LOAD_LOADED:
 		get_tree().change_scene_to_packed(ResourceLoader.load_threaded_get(scene_file_path))
