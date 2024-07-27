@@ -69,7 +69,7 @@ func _ready():
 	spawn_player()
 	spawn_enemies()
 	spawn_boss()
-	place_gameplay_components()
+	#place_gameplay_components()
 	
 	var turret_position = Vector2(
 		randf_range(-tutorial_room.size.x / 2, tutorial_room.size.x / 2),

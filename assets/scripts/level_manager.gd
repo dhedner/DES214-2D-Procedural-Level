@@ -1,6 +1,6 @@
 extends Node2D
 
-var room = preload("res://assets/scenes/room.tscn")
+var room_scene = preload("res://assets/scenes/room.tscn")
 var corridor = preload("res://assets/scenes/corridor.tscn")
 
 #@onready var tilemap = $TileMap
@@ -39,6 +39,7 @@ func clear_map(tilemap: TileMap):
 
 func make_rooms(tilemap: TileMap):
 	generate_diverse_rooms()
+
 	# Wait for rooms to settle via physics engine
 	await get_tree().create_timer(1.1).timeout
 	
@@ -58,7 +59,7 @@ func make_rooms(tilemap: TileMap):
 	create_corridors_from_graph()
 	find_main_path()
 	create_cycles()
-	check_room_distribution(tilemap, full_map)
+	await check_room_distribution(tilemap, full_map)
 	assign_distance_index()
 	
 	emit_signal("load_complete")
@@ -91,71 +92,15 @@ func generate_tiles(tilemap: TileMap):
 			tilemap.set_cell(1, Vector2i(x, y), 1, Vector2i(0, 3), 0)
 	print("Wall tiles placed.")
 	
-	# Carve out rooms and corridors
-	var corridors = [] # One corridor per connection
+	# Carve out rooms
 	for room in $Rooms.get_children():
-		var size = (room.size / tile_size).floor()
-		var position = tilemap.local_to_map(room.position)
-		var room_top_left = (room.position / tile_size).floor() - size
-		for x in range(2, size.x * 2 - 1):
-			for y in range(2, size.y * 2 - 1):
-				# Set floor tiles for layer 0
-				tilemap.set_cell(
-				0, 
-				Vector2i(room_top_left.x + x, 
-				room_top_left.y + y), 
-				1, 
-				Vector2i(1, 1), 0)
-				# Clear wall tiles for layer 1
-				tilemap.set_cell(
-				1, 
-				Vector2i(room_top_left.x + x, 
-				room_top_left.y + y), 
-				-1)
-		var current_room_id = path.get_closest_point(room.position)
-		for target_room_id in path.get_point_connections(current_room_id):
-			# Consider both directions without duplicating corridors
-			var connection_pair = {current_room_id: null, target_room_id: null}
-			if not connection_pair in corridors:
-				var starting_point = tilemap.local_to_map(Vector2(
-					path.get_point_position(current_room_id).x, 
-					path.get_point_position(current_room_id).y))
-				var ending_point = tilemap.local_to_map(Vector2(
-					path.get_point_position(target_room_id).x, 
-					path.get_point_position(target_room_id).y))
-				carve_path(tilemap, starting_point, ending_point)
-				corridors.append(connection_pair)
+		room.generate_room_tiles(tilemap)
+	
+	# Carve out corridors
+	for c in $Corridors.get_children():
+		c.generate_corridor_tiles(tilemap, path)
+
 	print("Rooms and corridors carved.")
-
-func carve_path(tilemap : TileMap, start, end):
-	# Carve a path between two points
-	var difference_x = sign(end.x - start.x)
-	var difference_y = sign(end.y - start.y)
-	
-	if difference_x == 0:
-		difference_x = pow(-1.0, randi() % 2)
-	if difference_y == 0:
-		difference_y = pow(-1.0, randi() % 2)
-	
-	# Choose either x/y or x/y
-	var x_over_y = start
-	var y_over_x = end
-	
-	if randi() % 2 > 0:
-		x_over_y = end
-		y_over_x = start
-
-	for x in range(start.x, end.x, difference_x):
-		# Make corridors 2-tiles wide
-		tilemap.set_cell(0, Vector2i(x, x_over_y.y), 1, Vector2i(1, 1), 0);
-		tilemap.set_cell(1, Vector2i(x, x_over_y.y), -1)
-		tilemap.set_cell(0, Vector2i(x, x_over_y.y + difference_y), 1, Vector2i(1, 1), 0);
-		tilemap.set_cell(1, Vector2i(x, x_over_y.y + difference_y), -1)
-	for y in range(start.y, end.y, difference_y):
-		tilemap.set_cell(0, Vector2i(y_over_x.x, y), 1, Vector2i(1, 1), 0);
-		tilemap.set_cell(1, Vector2i(y_over_x.x, y), -1)
-		tilemap.set_cell(0, Vector2i(y_over_x.x + difference_x, y), 1, Vector2i(1, 1), 0);
-		tilemap.set_cell(1, Vector2i(y_over_x.x + difference_x, y), -1)
 
 func generate_columns(tilemap: TileMap, num_columns: int):
 	var rooms = $Rooms.get_children()
@@ -236,16 +181,20 @@ func build_graph():
 		rooms.erase(min_position_room)
 
 func create_corridors_from_graph():
-	for point in path.get_point_ids():
-		for connection in path.get_point_connections(point):
-			var pp = path.get_point_position(point)
-			var cp = path.get_point_position(connection)
-			# instantiate a path
+	var visited = {}
+	for source_id in path.get_point_ids():
+		for destination_id in path.get_point_connections(source_id):
+			var source_position = path.get_point_position(source_id)
+			var destination_position = path.get_point_position(destination_id)
+
+			var source_destination_set = {source_id: null, destination_id: null}
+			if visited.has(source_destination_set):
+				continue
+
+			# instantiate a corridor
 			var current_corridor = corridor.instantiate()
-			current_corridor.make_corridor(pp, cp)
+			current_corridor.make_corridor(source_id, source_position, destination_id, destination_position)
 			$Corridors.add_child(current_corridor)
-			
-			var current_room = graph_id_to_room[connection]
 
 func find_start_and_end_rooms():
 	var min_axis = INF
@@ -271,11 +220,11 @@ func find_start_and_end_rooms():
 	end_room.is_end = true
 
 func create_start_and_end_rooms(current_start_room, current_end_room):
-	var new_start_room = room.instantiate()
+	var new_start_room = room_scene.instantiate()
 	var new_start_room_width = min_size + randi() % 3
 	var new_start_room_height = min_size + randi() % 3
 
-	var new_end_room = room.instantiate()
+	var new_end_room = room_scene.instantiate()
 	var new_end_room_width = min_size + randi() % 3
 	var new_end_room_height = min_size + randi() % 3
 
@@ -288,14 +237,14 @@ func create_start_and_end_rooms(current_start_room, current_end_room):
 	new_start_room.is_start = true
 	start_room = new_start_room
 	$Rooms.add_child(start_room)
-	new_start_room.freeze
+	# new_start_room.freeze
 
 	new_end_room.make_room(end_coordinates, Vector2(new_end_room_width, new_end_room_height) * tile_size)
 	current_end_room.is_end = false
 	new_end_room.is_end = true
 	end_room = new_end_room
 	$Rooms.add_child(end_room)
-	new_end_room.freeze
+	# new_end_room.freeze
 
 func find_main_path():
 	var path_from_start_to_end = path.get_id_path(start_room.graph_id, end_room.graph_id)
@@ -388,7 +337,7 @@ func generate_diverse_rooms():
 	# Create a set of rooms that are elongated
 	for i in range(elongated_rooms_count):
 		var room_position = Vector2(randf_range(-x_bias, x_bias), randf_range(-y_bias, y_bias))
-		var current_room = room.instantiate()
+		var current_room = room_scene.instantiate()
 		var room_size = Vector2.ZERO
 		# Favor rooms elongated along the y-axis
 		if randf() < 0.5:
@@ -401,7 +350,7 @@ func generate_diverse_rooms():
 	# Create a set of arena rooms that are large and proportionate
 	for i in range(arena_rooms_count):
 		var room_position = Vector2(randf_range(-x_bias, x_bias), randf_range(-y_bias, y_bias))
-		var current_room = room.instantiate()
+		var current_room = room_scene.instantiate()
 		var room_size = Vector2(max_size + 2 + randi() % 3, max_size + 2 + randi() % 3)
 		current_room.make_room(room_position, room_size * tile_size)
 		current_room.is_arena = true
@@ -410,7 +359,7 @@ func generate_diverse_rooms():
 	# Create a set of cramped rooms that are small and proportionate
 	for i in range(cramped_rooms_count):
 		var room_position = Vector2(randf_range(-x_bias, x_bias), randf_range(-y_bias, y_bias))
-		var current_room = room.instantiate()
+		var current_room = room_scene.instantiate()
 		var room_size = Vector2(min_size + randi() % 3, min_size + randi() % 3)
 		current_room.make_room(room_position, room_size * tile_size)
 		$Rooms.add_child(current_room)
@@ -418,7 +367,7 @@ func generate_diverse_rooms():
 	# Make remaining rooms truly random
 	for i in range(random_rooms_count):
 		var room_position = Vector2(randf_range(-x_bias, x_bias), randf_range(-y_bias, y_bias))
-		var current_room = room.instantiate()
+		var current_room = room_scene.instantiate()
 		var room_size = Vector2(min_size + randi() % (max_size - min_size), min_size + randi() % (max_size - min_size))
 		current_room.make_room(room_position, room_size * tile_size)
 		$Rooms.add_child(current_room)
