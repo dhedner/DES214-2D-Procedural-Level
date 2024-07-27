@@ -23,7 +23,6 @@ func _on_kill_timer_timeout():
 	queue_free()
 
 func _on_body_entered(body):
-	# Add check so that bullets don't hit the body that spawned them
 	if body.has_method("handle_hit"):
 		body.handle_hit(damage)
 	queue_free()

@@ -102,6 +102,7 @@ func _physics_process(delta):
 					# Optimal range is met, stop moving
 					else:
 						actor.velocity = Vector2.ZERO
+						actor.rotation = lerp_angle(actor.rotation, actor.global_position.direction_to(player.global_position).angle(), 1.0)
 				weapon.shoot()
 			else:
 				set_state(State.PATROL)

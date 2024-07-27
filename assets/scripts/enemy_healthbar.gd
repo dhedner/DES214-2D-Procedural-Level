@@ -1,6 +1,7 @@
 extends ProgressBar
 
 @onready var enemy = $".."
+@onready var enemy_actor = $"../CharacterBody2D"
 @onready var health = $"../Health"
 
 func _ready():
@@ -8,7 +9,7 @@ func _ready():
 	enemy.connect("enemy_health_changed", set_new_health_value)
 
 func _process(delta):
-	global_position = enemy.global_position + Vector2(-50, -50)
+	global_position = enemy_actor.global_position + Vector2(-50, -50)
 
 func set_enemy(enemy: Enemy):
 	self.enemy = enemy
