@@ -1,25 +1,21 @@
 extends Node2D
 class_name Enemy
 
-@onready var health_stat = $Health
+@onready var actor = $CharacterBody2D
 @onready var healthbar = $HealthBar
 
 @export var pathfinding: Pathfinding
 @export var item_scenes: Array[PackedScene] = []
 
-signal enemy_health_changed(new_health)
-
 func _ready():
+	print("Enemy ready")
 	pathfinding = get_node("/root/Pathfinding")
 	healthbar.set_enemy(self)
+	actor.connect("enemy_died", on_enemy_death)
 
-func handle_hit(damage):
-	health_stat.health -= damage
-	print("Enemy health: ", health_stat.health)
-	emit_signal("enemy_health_changed", health_stat.health)
-	if health_stat.health <= 0:
-		queue_free()
-		drop_item()
+func on_enemy_death():
+	queue_free()
+	drop_item()
 
 func drop_item():
 	var random_item = item_scenes[randi() % item_scenes.size()]

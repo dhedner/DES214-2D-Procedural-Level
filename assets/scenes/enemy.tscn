@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://6biqldqluklg"]
+[gd_scene load_steps=9 format=3 uid="uid://6biqldqluklg"]
 
 [ext_resource type="Script" path="res://assets/scripts/enemy.gd" id="1_aknsn"]
 [ext_resource type="Texture2D" uid="uid://cjf62shv1c3gf" path="res://assets/sprites/Enemy.png" id="1_q517i"]
 [ext_resource type="Script" path="res://assets/scripts/enemy_healthbar.gd" id="2_c2pif"]
+[ext_resource type="Script" path="res://assets/scripts/enemy_actor.gd" id="2_whlyj"]
 [ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="3_ji84n"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lh7ym"]
@@ -28,6 +29,7 @@ border_color = Color(0.0470588, 0.0470588, 0.0470588, 1)
 script = ExtResource("1_aknsn")
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+script = ExtResource("2_whlyj")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
 shape = SubResource("CircleShape2D_lh7ym")
