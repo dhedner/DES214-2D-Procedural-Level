@@ -1,0 +1,69 @@
+[gd_scene load_steps=10 format=3 uid="uid://bvys8hew44onn"]
+
+[ext_resource type="Texture2D" uid="uid://b87rie3vhtb2v" path="res://assets/sprites/GroundTorch.png" id="1_jxlp5"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_830lw"]
+size = Vector2(24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1r5o6"]
+atlas = ExtResource("1_jxlp5")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cua4d"]
+atlas = ExtResource("1_jxlp5")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3tur2"]
+atlas = ExtResource("1_jxlp5")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sue6l"]
+atlas = ExtResource("1_jxlp5")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_gkdqr"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1r5o6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cua4d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3tur2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sue6l")
+}],
+"loop": true,
+"name": &"default",
+"speed": 15.0
+}]
+
+[sub_resource type="Gradient" id="Gradient_drkok"]
+offsets = PackedFloat32Array(0.371495, 0.549065, 0.815421)
+colors = PackedColorArray(1, 1, 1, 1, 0.520161, 0.520161, 0.520161, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_naw0h"]
+gradient = SubResource("Gradient_drkok")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[node name="WallTorch" type="StaticBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 1)
+shape = SubResource("RectangleShape2D_830lw")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_gkdqr")
+autoplay = "default"
+frame_progress = 0.817779
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+color = Color(0.989158, 0.828803, 0.51289, 1)
+energy = 0.7
+shadow_enabled = true
+texture = SubResource("GradientTexture2D_naw0h")
+texture_scale = 2.0

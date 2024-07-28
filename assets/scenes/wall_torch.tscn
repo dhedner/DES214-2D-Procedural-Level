@@ -1,0 +1,68 @@
+[gd_scene load_steps=10 format=3 uid="uid://vsorqu31yv1d"]
+
+[ext_resource type="Texture2D" uid="uid://x1cuackqp57x" path="res://assets/sprites/WallTorch.png" id="1_70l87"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_830lw"]
+size = Vector2(16, 21)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_buc0g"]
+atlas = ExtResource("1_70l87")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_344jd"]
+atlas = ExtResource("1_70l87")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hojlv"]
+atlas = ExtResource("1_70l87")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ewseg"]
+atlas = ExtResource("1_70l87")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_iwmdy"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_buc0g")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_344jd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hojlv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ewseg")
+}],
+"loop": true,
+"name": &"default",
+"speed": 15.0
+}]
+
+[sub_resource type="Gradient" id="Gradient_drkok"]
+offsets = PackedFloat32Array(0.371495, 0.549065, 0.815421)
+colors = PackedColorArray(1, 1, 1, 1, 0.520161, 0.520161, 0.520161, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_naw0h"]
+gradient = SubResource("Gradient_drkok")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[node name="WallTorch" type="StaticBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0.5)
+shape = SubResource("RectangleShape2D_830lw")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_iwmdy")
+autoplay = "default"
+frame_progress = 0.52281
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+color = Color(0.989158, 0.828803, 0.51289, 1)
+energy = 0.7
+texture = SubResource("GradientTexture2D_naw0h")
+texture_scale = 2.0

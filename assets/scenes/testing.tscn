@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://ds32gktdgelrg"]
+[gd_scene load_steps=16 format=3 uid="uid://ds32gktdgelrg"]
 
 [ext_resource type="Script" path="res://assets/scripts/main_testing.gd" id="1_i3idi"]
 [ext_resource type="PackedScene" uid="uid://c51wqe5hc7j1k" path="res://assets/scenes/player.tscn" id="2_5gfxs"]
@@ -7,6 +7,9 @@
 [ext_resource type="Script" path="res://assets/scripts/pathfinding.gd" id="6_jgyay"]
 [ext_resource type="PackedScene" uid="uid://dqoe7pmwtj3lu" path="res://assets/scenes/enemy_tank.tscn" id="6_y1hik"]
 [ext_resource type="PackedScene" uid="uid://ffjdtfaqyex" path="res://assets/scenes/firerate_pickup.tscn" id="7_7wsq5"]
+[ext_resource type="PackedScene" uid="uid://vsorqu31yv1d" path="res://assets/scenes/wall_torch.tscn" id="8_3p3av"]
+[ext_resource type="PackedScene" uid="uid://bvys8hew44onn" path="res://assets/scenes/ground_torch.tscn" id="9_5dd0n"]
+[ext_resource type="PackedScene" uid="uid://d2v02qociburp" path="res://assets/scenes/spikes.tscn" id="10_57q3c"]
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_2bw41"]
 polygon = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
@@ -1756,3 +1759,12 @@ position = Vector2(320, 1)
 
 [node name="Fire Rate Powerup" parent="." instance=ExtResource("7_7wsq5")]
 position = Vector2(567, -4)
+
+[node name="WallTorch" parent="." instance=ExtResource("8_3p3av")]
+position = Vector2(48, -88)
+
+[node name="WallTorch2" parent="." instance=ExtResource("9_5dd0n")]
+position = Vector2(65, 92)
+
+[node name="Area2D" parent="." instance=ExtResource("10_57q3c")]
+position = Vector2(77, 0)
