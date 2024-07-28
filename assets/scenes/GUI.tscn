@@ -63,13 +63,13 @@ size_flags_vertical = 3
 [node name="KeyIcon" type="TextureRect" parent="MarginContainer/Bars/BottomRow"]
 layout_mode = 2
 texture = ExtResource("2_nnitl")
-stretch_mode = 3
+expand_mode = 3
 
 [node name="KeyCount" type="Label" parent="MarginContainer/Bars/BottomRow"]
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 10
 theme_override_fonts/font = ExtResource("3_fhfa1")
-theme_override_font_sizes/font_size = 40
+theme_override_font_sizes/font_size = 72
 text = "0"
 vertical_alignment = 1
