@@ -10,7 +10,9 @@ var corridor = preload("res://assets/scenes/corridor.tscn")
 @export var x_bias = 100
 @export var y_bias = 200
 @export var path_cycles = 1
+@export var corridor_size = 2
 @export var column_probability = 0.5
+@export var l_shaped_probability = 1.0
 
 @onready var tilemap : TileMap = $"../TileMap"
 
@@ -113,7 +115,7 @@ func generate_tiles(tilemap: TileMap):
 	
 	# Carve out rooms
 	for room in $Rooms.get_children():
-		room.pass_1(tilemap)
+		room.pass_1(self, tilemap)
 	
 	# Carve out corridors
 	for c in $Corridors.get_children():
@@ -284,7 +286,7 @@ func create_cycles():
 		
 		if closest_room and not path.are_points_connected(chosen_room.graph_id, closest_room.graph_id):
 			path.connect_points(chosen_room.graph_id, closest_room.graph_id, true)
-			create_corridor(chosen_room.position, closest_room.position)
+			create_corridor(chosen_room.graph_id, chosen_room.position, closest_room.graph_id, closest_room.position)
 			cycles_created += 1
 			print("Cycle created between: ", chosen_room, " and ", closest_room)
 
@@ -363,9 +365,9 @@ func generate_diverse_rooms():
 		current_room.make_room(room_position, room_size * tile_size)
 		$Rooms.add_child(current_room)
 
-func create_corridor(start_position, end_position):
+func create_corridor(source_id, source_position, destination_id, destination_position):
 	var new_corridor = corridor.instantiate()
-	new_corridor.make_corridor(start_position, end_position)
+	new_corridor.make_corridor(source_id, source_position, destination_id, destination_position)
 	$Corridors.add_child(new_corridor)
 
 func explore_distances(origin_room):
