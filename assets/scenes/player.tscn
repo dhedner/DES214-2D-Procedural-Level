@@ -27,6 +27,7 @@ move_speed = 170.0
 [node name="PointLight2D" type="PointLight2D" parent="Player"]
 color = Color(0.989158, 0.828803, 0.51289, 1)
 energy = 0.7
+shadow_enabled = true
 texture = SubResource("GradientTexture2D_v0124")
 texture_scale = 2.0
 

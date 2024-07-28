@@ -56,6 +56,7 @@ wait_time = 3.0
 [node name="PointLight2D" type="PointLight2D" parent="CharacterBody2D" index="4"]
 color = Color(0.989158, 0.828803, 0.51289, 1)
 energy = 0.7
+shadow_enabled = true
 texture = SubResource("GradientTexture2D_d7umt")
 texture_scale = 2.0
 

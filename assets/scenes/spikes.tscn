@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://d2v02qociburp"]
+
+[ext_resource type="Texture2D" uid="uid://wrdnbvo0g7ai" path="res://assets/sprites/PowerIcon.png" id="1_pr8yr"]
+[ext_resource type="Script" path="res://assets/scripts/spikes.gd" id="1_tbxug"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_msw2f"]
+size = Vector2(32, 32)
+
+[node name="Area2D" type="Area2D"]
+script = ExtResource("1_tbxug")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_msw2f")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_pr8yr")
