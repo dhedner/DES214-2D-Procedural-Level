@@ -42,7 +42,7 @@ func _ready():
 
 func _draw():
 	# Draw the room rectangle
-	draw_rect(Rect2(Vector2(-size.x / 2, -size.y / 2), Vector2(size.x, size.y)), Color(0, 0, 1, 0.2))
+	# draw_rect(Rect2(Vector2(-size.x / 2, -size.y / 2), Vector2(size.x, size.y)), Color(0, 0, 1, 0.2))
 
 	if has_corridor["top"]:
 		draw_line(Vector2(), Vector2(0, -size.y / 2), Color(1, 0, 0, 0.5), 2)
