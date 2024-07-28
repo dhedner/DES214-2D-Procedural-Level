@@ -174,16 +174,16 @@ func build_graph():
 		rooms.erase(min_position_room)
 
 func create_corridors_from_graph():
-	var visited = {}
+	var visited = []
 	for source_id in path.get_point_ids():
 		for destination_id in path.get_point_connections(source_id):
 			var source_position = path.get_point_position(source_id)
 			var destination_position = path.get_point_position(destination_id)
 
 			var source_destination_set = {source_id: null, destination_id: null}
-			if visited.has(source_destination_set):
+			if source_destination_set in visited:
 				continue
-			visited[source_destination_set] = true
+			visited.append(source_destination_set)
 
 			# instantiate a corridor
 			var current_corridor = corridor.instantiate()

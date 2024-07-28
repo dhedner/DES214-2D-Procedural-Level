@@ -81,10 +81,6 @@ func pass_1(level_manager, tilemap: TileMap):
 	# 	# 	if corner_rect.has_point(tile_position):
 	# 	# 		floor_tile_positions.erase(tile_position)
 
-	# Clear collision tiles for layer 1
-	for tile_position in floor_tile_positions:
-		tilemap.set_cell(1, tile_position, -1)
-
 	# Set the floor tiles in layer 0
 	tilemap.set_cells_terrain_connect(0, floor_tile_positions, 0, 1)
 	tilemap.set_cells_terrain_connect(1, floor_tile_positions, 0, -1)

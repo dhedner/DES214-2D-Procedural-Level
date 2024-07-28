@@ -11,6 +11,7 @@ func make_corridor(source_id, source_position, destination_id, destination_posit
 	source_graph_id = source_id
 	end_position = destination_position
 	destination_graph_id = destination_id
+	# print("Making corridor between ", source_id, " and ", destination_id)
 
 func generate_corridor_tiles(tilemap, path):
 	var starting_point = tilemap.local_to_map(Vector2(
