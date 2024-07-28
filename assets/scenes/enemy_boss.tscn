@@ -8,7 +8,7 @@
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_pp5wo"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_f687q"]
-radius = 30.0
+radius = 25.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5tg4p"]
 radius = 200.0
@@ -25,17 +25,14 @@ texture = ExtResource("2_voetn")
 shape = SubResource("CircleShape2D_f687q")
 
 [node name="Weapon" parent="CharacterBody2D" index="2" instance=ExtResource("4_0jkjl")]
-position = Vector2(40, 0)
+position = Vector2(47, 0)
 damage = 30
-speed = 1
+speed = 3
 
-[node name="BulletManager" type="Node2D" parent="CharacterBody2D" index="3"]
-script = ExtResource("6_pp5wo")
-
-[node name="AI" type="Node2D" parent="CharacterBody2D" index="4"]
+[node name="AI" type="Node2D" parent="CharacterBody2D" index="3"]
 script = ExtResource("5_afyrw")
-optimal_range = 100
-movement_speed = 80
+optimal_range = 200
+movement_speed = 50
 weapon_cooldown = 0.6
 
 [node name="PlayerDetectionZone" type="Area2D" parent="CharacterBody2D/AI" index="0"]
@@ -49,6 +46,9 @@ wait_time = 3.0
 [node name="Health" parent="." index="2"]
 max_health = 200
 health = 200
+
+[node name="BulletManager" type="Node2D" parent="." index="3"]
+script = ExtResource("6_pp5wo")
 
 [connection signal="body_entered" from="CharacterBody2D/AI/PlayerDetectionZone" to="CharacterBody2D/AI" method="_on_player_detection_zone_body_entered"]
 [connection signal="body_exited" from="CharacterBody2D/AI/PlayerDetectionZone" to="CharacterBody2D/AI" method="_on_player_detection_zone_body_exited"]

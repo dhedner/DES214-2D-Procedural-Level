@@ -11,7 +11,7 @@ enum State {
 @onready var actor = $".."
 @onready var player_detection_zone = $PlayerDetectionZone
 @onready var patrol_timer = $PatrolTimer
-@onready var bullet_manager = $"../BulletManager"
+@onready var bullet_manager = $"../../BulletManager"
 @onready var weapon = $"../Weapon"
 
 
@@ -42,6 +42,8 @@ func _ready():
 	detection_shape = player_detection_zone.shape_owner_get_shape(0, 0) as CircleShape2D
 	original_shape_radius = detection_shape.radius
 
+	enemy_fired_bullet.connect(Callable(bullet_manager, "handle_bullet_spawned"))
+	weapon.connect("weapon_fired", shoot)
 	weapon.set_cool_down(weapon_cooldown)
 
 	set_state(State.PATROL)
@@ -59,26 +61,26 @@ func _physics_process(delta):
 		State.ENGAGE:
 			if player != null:
 				var path = pathfinding.get_new_path(actor.global_position, player.global_position)
-				var min_optimal = optimal_range * 0.9
-				var max_optimal = optimal_range * 1.1
+				var min_optimal = optimal_range * 0.8
+				var max_optimal = optimal_range * 1.2
 				if path.size() > 1:
 					var dist = actor.global_position.distance_to(player.global_position)
 					# The enemy is too close to the player, move away
 					if dist > max_optimal:
 						target = path[1]
 						actor.velocity = actor.global_position.direction_to(target) * movement_speed
-						actor.rotation = lerp_angle(rotation, actor.velocity.angle(), 0.8)
+						actor.rotation = lerp_angle(rotation, actor.velocity.angle(), 1.0)
 						actor.move_and_slide()
 					# The enemy is too far from the player, move closer
 					elif dist < min_optimal:
 						target = path[1]
 						actor.velocity = actor.global_position.direction_to(target).rotated(deg_to_rad(180)) * movement_speed
-						actor.rotation = lerp_angle(actor.rotation, actor.global_position.direction_to(player.global_position).angle(), 0.8)
+						actor.rotation = lerp_angle(actor.rotation, actor.global_position.direction_to(player.global_position).angle(), 1.0)
 						actor.move_and_slide()
 					# Optimal range is met, stop moving
 					else:
 						actor.velocity = Vector2.ZERO
-						actor.rotation = lerp_angle(actor.rotation, actor.global_position.direction_to(player.global_position).angle(), 0.8)
+						actor.rotation = lerp_angle(actor.rotation, actor.global_position.direction_to(player.global_position).angle(), 1.0)
 				weapon.shoot()
 			else:
 				set_state(State.PATROL)
@@ -96,6 +98,9 @@ func set_state(new_state: int):
 
 func set_weapon(weapon):
 	self.weapon = weapon
+
+func shoot(bullet_instance, location, direction):
+	emit_signal("enemy_fired_bullet", bullet_instance, location, direction)
 
 func _on_player_detection_zone_body_entered(body):
 	var name = body.name

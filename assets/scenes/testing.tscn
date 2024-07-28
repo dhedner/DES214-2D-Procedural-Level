@@ -4,8 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://c51wqe5hc7j1k" path="res://assets/scenes/player.tscn" id="2_5gfxs"]
 [ext_resource type="PackedScene" uid="uid://bj2oytfctgclm" path="res://assets/scenes/map_ai.tscn" id="4_5qcul"]
 [ext_resource type="Texture2D" uid="uid://5uks27d5v8wq" path="res://assets/sprites/cavern.png" id="5_ln5kb"]
+[ext_resource type="PackedScene" uid="uid://cjpoc7bhl5u0o" path="res://assets/scenes/enemy_boss.tscn" id="6_1cgb7"]
 [ext_resource type="Script" path="res://assets/scripts/pathfinding.gd" id="6_jgyay"]
-[ext_resource type="PackedScene" uid="uid://c1ybel7dksmf0" path="res://assets/scenes/enemy_shooter.tscn" id="6_tn5vu"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_f3bhu"]
 texture = ExtResource("5_ln5kb")
@@ -82,5 +82,5 @@ layer_1/tile_data = PackedInt32Array(-131076, 1, 3, -65540, 1, 3, -4, 1, 3, 6553
 [node name="Pathfinding" type="Node2D" parent="."]
 script = ExtResource("6_jgyay")
 
-[node name="Enemy" parent="." instance=ExtResource("6_tn5vu")]
-position = Vector2(343, 6)
+[node name="Enemy" parent="." instance=ExtResource("6_1cgb7")]
+position = Vector2(335, 1)
