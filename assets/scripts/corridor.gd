@@ -54,3 +54,4 @@ func generate_corridor_tiles(tilemap, path):
 
 	# Set floor tiles
 	tilemap.set_cells_terrain_connect(0, corridor_tiles, 0, 1)
+	tilemap.set_cells_terrain_connect(1, corridor_tiles, 0, -1)

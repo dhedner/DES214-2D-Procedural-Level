@@ -66,9 +66,9 @@ func _ready():
 	map_ai.initialize(pathfinding)
 	
 	spawn_player()
-	# spawn_enemies()
-	# spawn_boss()
-	# place_gameplay_components()
+	#spawn_enemies()
+	#spawn_boss()
+	#place_gameplay_components()
 
 func _draw():
 	queue_redraw()

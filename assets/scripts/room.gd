@@ -1,5 +1,14 @@
 extends RigidBody2D
 
+enum RoomType {
+	START,
+	END,
+	ARENA,
+	ON_MAIN_PATH,
+	OFF_MAIN_PATH,
+	TUTORIAL,
+}
+
 var font = preload("res://assets/fonts/LiberationSans.ttf")
 
 var size
@@ -15,6 +24,7 @@ var room_size_in_tiles : Vector2i
 var room_position_in_tiles : Vector2i
 var room_top_left : Vector2i
 var floor_tile_positions = []
+var room_type : RoomType
 
 var debug_corner_rect = Rect2()
 
@@ -33,6 +43,7 @@ func make_room(_position, _size):
 	$CollisionShape2D.shape = new_shape
 
 func pass_1(level_manager, tilemap: TileMap):
+	# Set room rectangle parameters
 	var room_size_in_tiles_float = (size / tilemap.tile_set.tile_size.x).floor()
 	room_size_in_tiles = Vector2i(room_size_in_tiles_float.x, room_size_in_tiles_float.y)
 	room_position_in_tiles = tilemap.local_to_map(position)
@@ -70,15 +81,35 @@ func pass_1(level_manager, tilemap: TileMap):
 	# 	# 	if corner_rect.has_point(tile_position):
 	# 	# 		floor_tile_positions.erase(tile_position)
 
+	# Clear collision tiles for layer 1
 	for tile_position in floor_tile_positions:
-		# Clear collision tiles for layer 1
 		tilemap.set_cell(1, tile_position, -1)
 
 	# Set the floor tiles in layer 0
 	tilemap.set_cells_terrain_connect(0, floor_tile_positions, 0, 1)
+	tilemap.set_cells_terrain_connect(1, floor_tile_positions, 0, -1)
 
 func pass_2(level_manager, tilemap):
-	pass
+	# Compute the room type
+	if is_start:
+		room_type = RoomType.START
+		return
+
+	if is_end:
+		room_type = RoomType.END
+		return
+
+	if is_arena:
+		room_type = RoomType.ARENA
+		return
+
+	if is_on_main_path:
+		room_type = RoomType.ON_MAIN_PATH
+		return
+
+	if not is_on_main_path:
+		room_type = RoomType.OFF_MAIN_PATH
+		return
 
 func add_columns(level_manager, tilemap):
 	# Too small to have columns

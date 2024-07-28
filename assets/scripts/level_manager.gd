@@ -105,11 +105,11 @@ func generate_tiles(tilemap: TileMap):
 		for y in range (top_left.y, bottom_right.y):
 			wall_tiles.append(Vector2i(x, y))
 			
-			# Set all tiles on layer 1 to collision
-			tilemap.set_cell(1, Vector2i(x, y), 1, Vector2i(0, 3), 0)
+			# Set all tiles on layer 1 to collision (tile 2, 1)
+			# tilemap.set_cell(1, Vector2i(x, y), 1, Vector2i(2, 1), 0)
 
-	# Fill layer 0 with wall terrain
-	tilemap.set_cells_terrain_connect(0, wall_tiles, 0, 0)
+	# Fill layer 1 with wall terrain
+	tilemap.set_cells_terrain_connect(1, wall_tiles, 0, 0)
 
 	print("Wall tiles placed.")
 	
@@ -183,6 +183,7 @@ func create_corridors_from_graph():
 			var source_destination_set = {source_id: null, destination_id: null}
 			if visited.has(source_destination_set):
 				continue
+			visited[source_destination_set] = true
 
 			# instantiate a corridor
 			var current_corridor = corridor.instantiate()
