@@ -10,10 +10,13 @@ radius = 8.0
 script = ExtResource("1_53t6b")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.05, -0.05)
+position = Vector2(0, -2)
+rotation = 1.5708
+scale = Vector2(1.5, 1.5)
 texture = ExtResource("1_864c1")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -1)
 shape = SubResource("CircleShape2D_tfeon")
 
 [node name="KillTimer" type="Timer" parent="."]
