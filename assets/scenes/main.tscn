@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cvetfippmsxli"]
+[gd_scene load_steps=10 format=3 uid="uid://cvetfippmsxli"]
 
 [ext_resource type="Script" path="res://assets/scripts/main.gd" id="1_3sh7e"]
 [ext_resource type="PackedScene" uid="uid://jl64cwk2yjse" path="res://assets/scenes/level.tscn" id="2_pwn6v"]
@@ -1685,6 +1685,20 @@ terrain_set_0/terrain_2/name = "Floor Overlay"
 terrain_set_0/terrain_2/color = Color(0.242971, 0.505649, 0.662625, 1)
 sources/4 = SubResource("TileSetAtlasSource_xuunn")
 
+[sub_resource type="GDScript" id="GDScript_cfymv"]
+script/source = "extends Node
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+"
+
 [node name="Main" type="Node2D"]
 script = ExtResource("1_3sh7e")
 
@@ -1710,3 +1724,6 @@ script = ExtResource("3_5b60q")
 [node name="MapAI" parent="." instance=ExtResource("4_yisrq")]
 
 [node name="GUI" parent="." instance=ExtResource("6_kp3m4")]
+
+[node name="Placement" type="Node2D" parent="."]
+script = SubResource("GDScript_cfymv")

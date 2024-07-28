@@ -1,22 +1,17 @@
 extends RigidBody2D
 
-enum RoomType {
-	START,
-	END,
-	ARENA,
-	ON_MAIN_PATH,
-	OFF_MAIN_PATH,
-	TREASURE,
-	TUTORIAL,
-}
-
 var font = preload("res://assets/fonts/LiberationSans.ttf")
+var heart_container = preload("res://assets/scenes/heart_container.tscn")
+var firerate_pickup = preload("res://assets/scenes/firerate_pickup.tscn")
+var health_pickup = preload("res://assets/scenes/health_pickup.tscn")
+var swift_boots = preload("res://assets/scenes/swift_boots.tscn")
 
 var size
 var is_start = false
 var is_end = false
 var main_path_index = -1
 var distance_index = -1
+var distance_score = 0.0 # how far this room is from the start
 var graph_id
 var corridor_count = 0 # does not count cycles
 var is_arena = false
@@ -27,7 +22,8 @@ var room_position_in_tiles : Vector2i
 var room_top_left : Vector2i
 var floor_tile_positions = []
 var corridor_tile_positions = []
-var room_type : RoomType
+var corridors = []
+var room_type
 @onready var tilemap : TileMap = get_tree().get_root().get_node("Main/TileMap")
 
 var corner_rect = Rect2i()
@@ -61,6 +57,21 @@ func make_room(_position, _size):
 	new_shape.extents = size
 	$CollisionShape2D.shape = new_shape
 
+func spawn_with_policy(level_manager, objects_to_spawn):
+	for object_descriptor in objects_to_spawn:
+		var tile_positions = get_tiles_for_placement(
+			object_descriptor["placement"], 
+			object_descriptor["count"].call(level_manager, self))
+
+		for tile_position in tile_positions:
+			var pickup_object_instance = object_descriptor["type"].instantiate()
+			add_child(pickup_object_instance)
+			pickup_object_instance.position = get_local_from_tileset(tile_position)
+			print("Spawning ", object_descriptor["type"], " at ", pickup_object_instance.position)
+
+func set_cleared_pickup(objects_to_spawn):
+	pass
+
 func add_floor_tiles(tile_positions, is_corridor):
 	# Add floor tiles to the floor layer
 	tilemap.set_cells_terrain_connect(0, tile_positions, 0, 1)
@@ -89,6 +100,9 @@ func pass_1(level_manager):
 	else:
 		room_type = RoomType.OFF_MAIN_PATH
 
+	# Compute the distance score
+	distance_score = distance_index / level_manager.max_distance_index
+
 	# Set room rectangle parameters
 	var room_size_in_tiles_float = (size / tilemap.tile_set.tile_size.x).floor()
 	room_size_in_tiles = Vector2i(room_size_in_tiles_float.x, room_size_in_tiles_float.y)
@@ -97,7 +111,6 @@ func pass_1(level_manager):
 
 	make_l_shaped(level_manager)
 	compute_floor_tiles()
-	do_placement(level_manager)
 
 func compute_floor_tiles():
 	floor_tile_positions = []
@@ -119,14 +132,13 @@ func add_corridor_tiles(corridor_tiles):
 
 func make_l_shaped(level_manager):
 	# Check if this room should be L-shaped
-	if room_type != RoomType.ON_MAIN_PATH and room_type != RoomType.OFF_MAIN_PATH:
+	if (room_type != RoomType.ON_MAIN_PATH and room_type != RoomType.OFF_MAIN_PATH) or is_elongated:
 		return
 	
 	if randf() > level_manager.l_shaped_probability:
 		return
 
 	corner_rect = Rect2i()
-	var corridor_clearance = Vector2i(level_manager.corridor_size / 2, level_manager.corridor_size / 2)
 
 	# Pick a corner to chop off and make space for the corridor
 	var corner_offset = [
@@ -141,23 +153,29 @@ func make_l_shaped(level_manager):
 
 	corner_rect = Rect2i(room_position_in_tiles + offset, room_size_in_tiles)	
 	debug_corner_rect = Rect2(
-		to_local(tilemap.map_to_local(corner_rect.position)), 
+		get_local_from_tileset(corner_rect.position),
 		corner_rect.size * tilemap.tile_set.tile_size)
 
 	print("room_id=", graph_id, " is L-shaped corner=", choice)
 
-	# # Filter out the corner tiles
-	# for tile_position in floor_tile_positions:
-	# 	if corner_rect.has_point(tile_position):
-	# 		floor_tile_positions.erase(tile_position)
+func get_local_from_tileset(tile_position):
+	return to_local(tilemap.map_to_local(tile_position))
 
-func do_placement(level_manager):	
-	# Check if this room should have columns
+func get_tiles_for_placement(placement_type, placement_count):
+	var tile_positions = []
 
-	if size.x < level_manager.min_size + 2 or size.y < level_manager.min_size + 2 or is_arena:
-		return
+	match placement_type:
+		PlacementType.CENTER:
+			# Find the positions in floor_tile_positions that are closest to the center
+			var center = room_position_in_tiles
+			# Copy the array so we can sort it
+			var closest_positions = floor_tile_positions.duplicate()
+			closest_positions.sort_custom(
+				func (a, b): return (a - center).length_squared() < (b - center).length_squared())
+			tile_positions = closest_positions.slice(0, placement_count)
+	
+	# Remove them from floor_tile_positions
+	for tile_position in tile_positions:
+		floor_tile_positions.erase(floor_tile_positions.find(tile_position))
 
-	if randf() >= level_manager.column_probability:
-		return
-
-	print("room_id: ", graph_id, " has columns.")
+	return tile_positions

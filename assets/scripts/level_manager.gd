@@ -18,6 +18,7 @@ var corridor = preload("res://assets/scenes/corridor.tscn")
 
 var path : AStar2D # Graph that contains all the rooms and their corridors
 var graph_id_to_room
+var max_distance_index = 0
 var debug_mode = false
 var start_room = null
 var end_room = null
@@ -179,10 +180,7 @@ func create_corridors_from_graph():
 				continue
 			visited.append(source_destination_set)
 
-			# instantiate a corridor
-			var current_corridor = corridor.instantiate()
-			current_corridor.make_corridor(graph_id_to_room[source_id], graph_id_to_room[destination_id])
-			$Corridors.add_child(current_corridor)
+			create_corridor(graph_id_to_room[source_id], graph_id_to_room[destination_id])
 
 func find_start_and_end_rooms():
 	var min_axis = INF
@@ -392,3 +390,6 @@ func assign_distance_index():
 	var distances = explore_distances(start_room)
 	for room in $Rooms.get_children():
 		room.distance_index = distances[room.graph_id]
+		if room.distance_index > max_distance_index:
+			max_distance_index = room.distance_index
+	
