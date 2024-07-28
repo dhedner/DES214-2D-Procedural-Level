@@ -333,6 +333,7 @@ func generate_diverse_rooms():
 		else:
 			room_size = Vector2(randf_range(max_size, max_size - 2), randf_range(min_size, min_size + 2))
 		current_room.make_room(room_position, room_size * tile_size)
+		current_room.is_elongated = true
 		$Rooms.add_child(current_room)
 	
 	# Create a set of arena rooms that are large and proportionate
@@ -350,6 +351,7 @@ func generate_diverse_rooms():
 		var current_room = room_scene.instantiate()
 		var room_size = Vector2(min_size + randi() % 3, min_size + randi() % 3)
 		current_room.make_room(room_position, room_size * tile_size)
+		current_room.is_cramped = true
 		$Rooms.add_child(current_room)
 
 	# Make remaining rooms truly random

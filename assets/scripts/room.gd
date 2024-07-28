@@ -6,6 +6,7 @@ enum RoomType {
 	ARENA,
 	ON_MAIN_PATH,
 	OFF_MAIN_PATH,
+	TREASURE,
 	TUTORIAL,
 }
 
@@ -17,28 +18,34 @@ var is_end = false
 var main_path_index = -1
 var distance_index = -1
 var graph_id
-var corridor_count = 0
-var is_on_main_path = false
+var corridor_count = 0 # does not count cycles
 var is_arena = false
+var is_elongated = false
+var is_cramped = false
 var room_size_in_tiles : Vector2i
 var room_position_in_tiles : Vector2i
 var room_top_left : Vector2i
 var floor_tile_positions = []
 var corridor_tile_positions = []
 var room_type : RoomType
+@onready var tilemap : TileMap = get_tree().get_root().get_node("Main/TileMap")
 
 var corner_rect = Rect2i()
 var debug_corner_rect = Rect2()
-
-var tilemap : TileMap
-
-func _ready():
-	tilemap = get_tree().get_root().get_node("Main/TileMap")
+var room_colors = {
+	RoomType.START: Color(0, 1, 0, 0.3), # Green
+	RoomType.END: Color(1, 0, 0, 0.3), # Red
+	RoomType.ARENA: Color(0, 0, 1, 0.3), # Blue
+	RoomType.ON_MAIN_PATH: Color(1, 1, 0, 0.3), # Yellow
+	RoomType.OFF_MAIN_PATH: Color(0, 1, 1, 0.3), # Cyan
+	RoomType.TREASURE: Color(1, 0.5, 0, 0.3), # Orange
+	RoomType.TUTORIAL: Color(1, 0, 1, 0.3), # Magenta
+}
 
 func _draw():
 	pass
 	# Draw the room rectangle
-	# draw_rect(Rect2(Vector2(-size.x / 2, -size.y / 2), Vector2(size.x, size.y)), Color(0, 0, 1, 0.2))
+	# draw_rect(Rect2(Vector2(-size.x / 2, -size.y / 2), Vector2(size.x, size.y)), room_colors[room_type])
 
 	# draw_rect(debug_corner_rect, Color(1, 0, 0, 0.3))
 
@@ -75,8 +82,10 @@ func pass_1(level_manager):
 		room_type = RoomType.ARENA
 	elif main_path_index == 1:
 		room_type = RoomType.TUTORIAL
-	elif is_on_main_path:
+	elif main_path_index > 1:
 		room_type = RoomType.ON_MAIN_PATH
+	elif corridor_count == 1:
+		room_type = RoomType.TREASURE
 	else:
 		room_type = RoomType.OFF_MAIN_PATH
 

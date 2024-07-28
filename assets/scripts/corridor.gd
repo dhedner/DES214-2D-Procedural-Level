@@ -4,10 +4,7 @@ var source_room
 var destination_room
 var locked = false
 
-var tilemap : TileMap
-
-func _ready():
-	tilemap = get_tree().get_root().get_node("Main/TileMap")
+@onready var tilemap : TileMap = get_tree().get_root().get_node("Main/TileMap")
 
 func make_corridor(_source_room, _destination_room):
 	source_room = _source_room
