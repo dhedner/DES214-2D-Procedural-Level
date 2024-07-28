@@ -131,10 +131,10 @@ func pass_1(level_manager):
 		room_type = RoomType.START
 	elif is_end:
 		room_type = RoomType.END
-	elif is_arena:
-		room_type = RoomType.ARENA
 	elif main_path_index == 1:
 		room_type = RoomType.TUTORIAL
+	elif is_arena:
+		room_type = RoomType.ARENA
 	elif main_path_index > 1:
 		room_type = RoomType.ON_MAIN_PATH
 	elif corridor_count == 1:
