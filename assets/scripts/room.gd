@@ -74,8 +74,8 @@ func add_floor_tiles(tile_positions, is_corridor):
 	tilemap.set_cells_terrain_connect(1, tile_positions, 0, -1)
 	
 	# Floor overlay (such as grates)
-	# if not is_corridor:
-	tilemap.set_cells_terrain_connect(2, tile_positions, 0, 2)
+	if not is_corridor:
+		tilemap.set_cells_terrain_connect(2, tile_positions, 0, 2)
 
 func pass_1(level_manager):
 	# Set room rectangle parameters
