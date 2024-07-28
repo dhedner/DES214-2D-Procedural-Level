@@ -3090,6 +3090,16 @@ layer_1/tile_data = PackedInt32Array()
 layer_2/name = "Floor Overlay"
 layer_2/tile_data = PackedInt32Array()
 
+[node name="DirectionalLight2D" type="DirectionalLight2D" parent="."]
+color = Color(0.435294, 0.376471, 0.196078, 1)
+shadow_enabled = true
+shadow_color = Color(0.00184107, 0.00184107, 0.00184107, 0)
+shadow_filter = 2
+height = 0.43
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.637843, 0.637843, 0.637843, 1)
+
 [node name="Level" parent="." instance=ExtResource("2_pwn6v")]
 
 [node name="Pathfinding" type="Node2D" parent="."]
@@ -3097,7 +3107,7 @@ script = ExtResource("3_5b60q")
 
 [node name="MapAI" parent="." instance=ExtResource("4_yisrq")]
 
-[node name="GUI" parent="." instance=ExtResource("6_kp3m4")]
-
 [node name="Placement" type="Node2D" parent="."]
 script = SubResource("GDScript_cfymv")
+
+[node name="GUI" parent="." instance=ExtResource("6_kp3m4")]
