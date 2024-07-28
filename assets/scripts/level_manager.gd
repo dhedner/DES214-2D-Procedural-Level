@@ -12,6 +12,7 @@ var corridor = preload("res://assets/scenes/corridor.tscn")
 @export var path_cycles = 1
 @export var corridor_size = 2
 @export var column_probability = 0.5
+@export var pit_probability = 0.25
 @export var l_shaped_probability = 0.25
 
 @onready var tilemap : TileMap = $"../TileMap"

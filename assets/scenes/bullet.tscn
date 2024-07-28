@@ -16,6 +16,7 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 
 [node name="Bullet" type="Area2D"]
+collision_layer = 4
 script = ExtResource("1_53t6b")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

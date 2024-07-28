@@ -21,6 +21,7 @@ radius = 15.0
 [node name="Node2D" type="Node2D"]
 
 [node name="Player" type="CharacterBody2D" parent="."]
+collision_mask = 13
 script = ExtResource("1_feuro")
 move_speed = 170.0
 

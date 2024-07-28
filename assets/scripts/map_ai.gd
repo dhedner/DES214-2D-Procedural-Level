@@ -17,16 +17,16 @@ var swift_boots = preload("res://assets/scenes/swift_boots.tscn")
 
 var terrain_spawn_policies = [
 	{
-		"rule_name": "start room floor",
-		"condition": func(level_manager, room): return room.is_start,
+		"rule_name": "pits",
+		"condition": func(level_manager, room): return not room.is_cramped and not room.is_elongated and (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and randf() < level_manager.pit_probability,
 		"continue_evaluating": false,
 		"spawn_terrain": [
 			{
 				"layer": 2,
-				"terrain": 2,
-				"count": func(level_manager, room): return 1000000,
-				"placement": PlacementType.FLOOR,
-				"is_blocking_tiles": false,
+				"terrain": 3,
+				"count": func(level_manager, room): return 9,
+				"placement": PlacementType.CENTER,
+				"is_blocking_tiles": true,
 			}
 		]
 	}
@@ -79,8 +79,8 @@ var object_spawn_policies = [
 	},
 ]
 
-func spawn_room_objects(level_manager):
-	for room in level_manager.room_container.get_children():		
+func spawn_room_objects(level_manager, room_container):
+	for room in room_container.get_children():		
 		for policy in terrain_spawn_policies:
 			if not policy["condition"].call(level_manager, room):
 				continue

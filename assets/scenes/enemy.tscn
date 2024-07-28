@@ -29,6 +29,7 @@ border_color = Color(0.0470588, 0.0470588, 0.0470588, 1)
 script = ExtResource("1_aknsn")
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+collision_mask = 13
 script = ExtResource("2_whlyj")
 
 [node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D"]

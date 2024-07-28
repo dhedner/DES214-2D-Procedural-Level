@@ -24,7 +24,7 @@ func _ready():
 	pathfinding.create_navigation_map(tilemap)
 
 	spawn_player()
-	map_ai.spawn_room_objects(self)
+	map_ai.spawn_room_objects(level_manager, room_container)
 
 func _draw():
 	queue_redraw()
