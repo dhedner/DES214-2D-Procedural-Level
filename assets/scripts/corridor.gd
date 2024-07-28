@@ -37,15 +37,30 @@ func generate_corridor_tiles(tilemap, path):
 		x_over_y = ending_point
 		y_over_x = starting_point
 
+	var corridor_tiles = []
 	for x in range(starting_point.x, ending_point.x, difference_x):
 		# Make corridors 2-tiles wide
-		tilemap.set_cell(0, Vector2i(x, x_over_y.y), 1, Vector2i(1, 1), 0);
-		tilemap.set_cell(1, Vector2i(x, x_over_y.y), -1)
-		tilemap.set_cell(0, Vector2i(x, x_over_y.y + difference_y), 1, Vector2i(1, 1), 0);
-		tilemap.set_cell(1, Vector2i(x, x_over_y.y + difference_y), -1)
+		corridor_tiles.append(Vector2i(x, x_over_y.y))
+		corridor_tiles.append(Vector2i(x, x_over_y.y + difference_y))
+
+		# tilemap.set_cell(0, Vector2i(x, x_over_y.y), 1, Vector2i(1, 1), 0);
+		# tilemap.set_cell(1, Vector2i(x, x_over_y.y), -1)
+		# tilemap.set_cell(0, Vector2i(x, x_over_y.y + difference_y), 1, Vector2i(1, 1), 0);
+		# tilemap.set_cell(1, Vector2i(x, x_over_y.y + difference_y), -1)
 
 	for y in range(starting_point.y, ending_point.y, difference_y):
-		tilemap.set_cell(0, Vector2i(y_over_x.x, y), 1, Vector2i(1, 1), 0);
-		tilemap.set_cell(1, Vector2i(y_over_x.x, y), -1)
-		tilemap.set_cell(0, Vector2i(y_over_x.x + difference_x, y), 1, Vector2i(1, 1), 0);
-		tilemap.set_cell(1, Vector2i(y_over_x.x + difference_x, y), -1)
+		# Make corridors 2-tiles wide
+		corridor_tiles.append(Vector2i(y_over_x.x, y))
+		corridor_tiles.append(Vector2i(y_over_x.x + difference_x, y))
+		
+		# tilemap.set_cell(0, Vector2i(y_over_x.x, y), 1, Vector2i(1, 1), 0);
+		# tilemap.set_cell(1, Vector2i(y_over_x.x, y), -1)
+		# tilemap.set_cell(0, Vector2i(y_over_x.x + difference_x, y), 1, Vector2i(1, 1), 0);
+		# tilemap.set_cell(1, Vector2i(y_over_x.x + difference_x, y), -1)
+
+	for tile in corridor_tiles:
+		# Clear collisions 
+		tilemap.set_cell(1, tile, -1)
+
+	# Set floor tiles
+	tilemap.set_cells_terrain_connect(0, corridor_tiles, 0, 1)

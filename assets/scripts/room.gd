@@ -14,6 +14,7 @@ var is_arena = false
 var room_size_in_tiles : Vector2i
 var room_position_in_tiles : Vector2i
 var room_top_left : Vector2i
+@export var floor_tile_positions = []
 	
 func make_room(_position, _size):
 	position = _position
@@ -24,24 +25,34 @@ func make_room(_position, _size):
 	$CollisionShape2D.shape = new_shape
 
 # Change to use various layers of the same tile map (0 for floor)
-func generate_room_tiles(tilemap: TileMap):
+func pass_1(tilemap: TileMap):
 	var room_size_in_tiles_float = (size / tilemap.tile_set.tile_size.x).floor()
 	room_size_in_tiles = Vector2i(room_size_in_tiles_float.x, room_size_in_tiles_float.y)
 	room_position_in_tiles = tilemap.local_to_map(position)
 	room_top_left = room_position_in_tiles - room_size_in_tiles / 2
+	
+	floor_tile_positions = []
 	for x in range(room_size_in_tiles.x):
 		for y in range(room_size_in_tiles.y):
 			var tile_position = Vector2i(x, y) + room_top_left
+			floor_tile_positions.append(tile_position)
 
-			# Set floor tiles for layer 0
-			tilemap.set_cell(0, tile_position, 1, Vector2i(1, 1), 0)
+			# # Set floor tiles for layer 0
+			# tilemap.set_cell(0, tile_position, 1, Vector2i(1, 1), 0)
 
-			# Clear wall tiles for layer 1
+			# Clear collision tiles for layer 1
 			tilemap.set_cell(1, tile_position, -1)
 
 			# print("roomid=", graph_id, " floor=", tile_position)
 
-func add_room_objects(level_manager, tilemap):
+	# Set the floor tiles in layer 0
+	tilemap.set_cells_terrain_connect(0, floor_tile_positions, 0, 1)
+
+func pass_2(level_manager, tilemap):
+	# Make corner tiles for the tiles in the room
+	make_corner_tiles(tilemap)
+
+func make_corner_tiles(tilemap):
 	pass
 
 func add_columns(level_manager, tilemap):

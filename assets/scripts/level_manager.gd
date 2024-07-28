@@ -69,9 +69,9 @@ func make_rooms(tilemap: TileMap):
 
 	assign_distance_index()
 
-	# Add room-specific objects
+	# Second pass of room generation now that the base tiles are set
 	for room in $Rooms.get_children():
-		room.add_room_objects(self, tilemap)
+		room.pass_2(self, tilemap)
 	
 	return true
 
@@ -98,16 +98,22 @@ func generate_tiles(tilemap: TileMap):
 		
 	var top_left = tilemap.local_to_map(full_rect.position)
 	var bottom_right = tilemap.local_to_map(full_rect.end)
+	var wall_tiles = []
 	for x in range (top_left.x, bottom_right.x):
 		for y in range (top_left.y, bottom_right.y):
-			# Set all tiles on layer 1 to walls
+			wall_tiles.append(Vector2i(x, y))
+			
+			# Set all tiles on layer 1 to collision
 			tilemap.set_cell(1, Vector2i(x, y), 1, Vector2i(0, 3), 0)
+
+	# Fill layer 0 with wall terrain
+	tilemap.set_cells_terrain_connect(0, wall_tiles, 0, 0)
 
 	print("Wall tiles placed.")
 	
 	# Carve out rooms
 	for room in $Rooms.get_children():
-		room.generate_room_tiles(tilemap)
+		room.pass_1(tilemap)
 	
 	# Carve out corridors
 	for c in $Corridors.get_children():
