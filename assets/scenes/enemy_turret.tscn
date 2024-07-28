@@ -1,87 +1,38 @@
-[gd_scene load_steps=13 format=3 uid="uid://cha8w0vfkicu8"]
+[gd_scene load_steps=6 format=3 uid="uid://cahyb42t68n2x"]
 
-[ext_resource type="Script" path="res://assets/scripts/enemy.gd" id="1_ikw1o"]
-[ext_resource type="Texture2D" uid="uid://cjf62shv1c3gf" path="res://assets/sprites/Enemy.png" id="2_clmbh"]
-[ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="2_skd7x"]
-[ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="3_ahgte"]
-[ext_resource type="Script" path="res://assets/scripts/enemy_healthbar.gd" id="4_72ae6"]
-[ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_p3p3q"]
-[ext_resource type="Script" path="res://assets/scripts/enemy_turretAI.gd" id="5_ovouv"]
-[ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_ncx3v"]
+[ext_resource type="PackedScene" uid="uid://6biqldqluklg" path="res://assets/scenes/enemy.tscn" id="1_a45rv"]
+[ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="3_ix23b"]
+[ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="4_1bc3l"]
+[ext_resource type="Script" path="res://assets/scripts/enemy_turretAI.gd" id="5_i3s6b"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w1ahc"]
-bg_color = Color(0.192157, 0.0705882, 0.0588235, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.0475577, 0.0475577, 0.0475576, 1)
+[sub_resource type="CircleShape2D" id="CircleShape2D_5tg4p"]
+radius = 160.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gqhcq"]
-bg_color = Color(0.862745, 0.160784, 0.133333, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.0470588, 0.0470588, 0.0470588, 1)
+[node name="Enemy" instance=ExtResource("1_a45rv")]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_sm8x5"]
-radius = 20.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_2qne8"]
-radius = 140.0
-
-[node name="Turret Enemy" type="CharacterBody2D"]
+[node name="Sprite2D" parent="CharacterBody2D" index="0"]
 rotation = 1.5708
-script = ExtResource("1_ikw1o")
-item_scenes = Array[PackedScene]([ExtResource("2_skd7x")])
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-rotation = 1.5708
-scale = Vector2(0.7, 0.7)
-texture = ExtResource("2_clmbh")
-
-[node name="HealthBar" type="ProgressBar" parent="."]
-custom_minimum_size = Vector2(100, 15)
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -50.0
-offset_top = 50.0
-offset_right = 50.0
-offset_bottom = 65.0
-grow_horizontal = 2
-rotation = -1.5708
-mouse_filter = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_w1ahc")
-theme_override_styles/fill = SubResource("StyleBoxFlat_gqhcq")
-value = 100.0
-show_percentage = false
-script = ExtResource("4_72ae6")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_sm8x5")
-
-[node name="Health" parent="." instance=ExtResource("3_ahgte")]
-health = 150
-
-[node name="Weapon" parent="." instance=ExtResource("4_p3p3q")]
+[node name="Weapon" parent="CharacterBody2D" index="2" instance=ExtResource("3_ix23b")]
 position = Vector2(33, 0)
+damage = 10
+speed = 3
 
-[node name="AI" type="Node2D" parent="."]
-script = ExtResource("5_ovouv")
+[node name="BulletManager" type="Node2D" parent="CharacterBody2D" index="3"]
+script = ExtResource("4_1bc3l")
 
-[node name="PlayerDetectionZone" type="Area2D" parent="AI"]
+[node name="AI" type="Node2D" parent="." index="3"]
+script = ExtResource("5_i3s6b")
+weapon_cooldown = 1.0
+patrol_range = 60
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="AI/PlayerDetectionZone"]
-shape = SubResource("CircleShape2D_2qne8")
+[node name="PlayerDetectionZone" type="Area2D" parent="AI" index="0"]
 
-[node name="PatrolTimer" type="Timer" parent="AI"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AI/PlayerDetectionZone" index="0"]
+shape = SubResource("CircleShape2D_5tg4p")
+
+[node name="PatrolTimer" type="Timer" parent="AI" index="1"]
 wait_time = 3.0
-one_shot = true
-
-[node name="BulletManager" type="Node2D" parent="."]
-script = ExtResource("6_ncx3v")
 
 [connection signal="body_entered" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_entered"]
 [connection signal="body_exited" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_exited"]

@@ -1,10 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://cjpoc7bhl5u0o"]
+[gd_scene load_steps=8 format=3 uid="uid://dqoe7pmwtj3lu"]
 
-[ext_resource type="PackedScene" uid="uid://6biqldqluklg" path="res://assets/scenes/enemy.tscn" id="1_fyjvv"]
-[ext_resource type="Texture2D" uid="uid://bvnwyjaieeny6" path="res://assets/sprites/BossEnemy.png" id="2_voetn"]
-[ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_0jkjl"]
-[ext_resource type="Script" path="res://assets/scripts/enemy_bossAI.gd" id="5_afyrw"]
-[ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_pp5wo"]
+[ext_resource type="PackedScene" uid="uid://6biqldqluklg" path="res://assets/scenes/enemy.tscn" id="1_qkcas"]
+[ext_resource type="Texture2D" uid="uid://bvnwyjaieeny6" path="res://assets/sprites/BossEnemy.png" id="2_nag0k"]
+[ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="3_ay23v"]
+[ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="4_xe4rr"]
+[ext_resource type="Script" path="res://assets/scripts/enemy_tankAI.gd" id="5_3vl0s"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_f687q"]
 radius = 30.0
@@ -12,30 +12,30 @@ radius = 30.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_5tg4p"]
 radius = 200.0
 
-[node name="Enemy" instance=ExtResource("1_fyjvv")]
-scale = Vector2(1.5, 1.5)
+[node name="Enemy" instance=ExtResource("1_qkcas")]
 
 [node name="Sprite2D" parent="CharacterBody2D" index="0"]
 rotation = 1.5708
 scale = Vector2(1, 1)
-texture = ExtResource("2_voetn")
+texture = ExtResource("2_nag0k")
 
 [node name="CollisionShape2D" parent="CharacterBody2D" index="1"]
 shape = SubResource("CircleShape2D_f687q")
 
-[node name="Weapon" parent="CharacterBody2D" index="2" instance=ExtResource("4_0jkjl")]
+[node name="Weapon" parent="CharacterBody2D" index="2" instance=ExtResource("3_ay23v")]
 position = Vector2(40, 0)
-damage = 30
-speed = 1
+damage = 20
+speed = 2
 
 [node name="BulletManager" type="Node2D" parent="CharacterBody2D" index="3"]
-script = ExtResource("6_pp5wo")
+script = ExtResource("4_xe4rr")
 
 [node name="AI" type="Node2D" parent="CharacterBody2D" index="4"]
-script = ExtResource("5_afyrw")
+script = ExtResource("5_3vl0s")
 optimal_range = 100
-movement_speed = 80
-weapon_cooldown = 0.6
+movement_speed = 30
+weapon_cooldown = 1.0
+patrol_range = 50
 
 [node name="PlayerDetectionZone" type="Area2D" parent="CharacterBody2D/AI" index="0"]
 

@@ -8,22 +8,36 @@ enum State {
 	ENGAGE
 }
 
+@onready var actor = $"../CharacterBody2D"
 @onready var player_detection_zone = $PlayerDetectionZone
 @onready var patrol_timer = $PatrolTimer
-@onready var bullet_manager = $"../BulletManager"
+@onready var bullet_manager = $"../CharacterBody2D/BulletManager"
+@onready var weapon = $"../CharacterBody2D/Weapon"
+
+@export var weapon_cooldown: float
+@export var patrol_range: int
 
 var current_state: int = -1 : set = set_state
 var player = null
-var weapon = null
-var actor: CharacterBody2D = null
+
+# Engage state
+var detection_shape: CircleShape2D
+var original_shape_radius: float = 0.0
 
 var pathfinding: Pathfinding
+var target : Vector2 = Vector2.ZERO
 
 func _ready():
 	actor = self.actor
-	set_state(State.PATROL)
+
+	detection_shape = player_detection_zone.shape_owner_get_shape(0, 0) as CircleShape2D
+	original_shape_radius = detection_shape.radius
 
 	enemy_fired_bullet.connect(Callable(bullet_manager, "handle_bullet_spawned"))
+	weapon.connect("weapon_fired", shoot)
+	weapon.set_cool_down(weapon_cooldown)
+
+	set_state(State.PATROL)
 
 func _physics_process(delta):
 	match current_state:
@@ -33,15 +47,6 @@ func _physics_process(delta):
 			if player != null and weapon != null:
 				actor.rotation = actor.global_position.direction_to(player.global_position).angle()
 				weapon.shoot()
-
-# Pseudo constructor
-func initialize(actor, weapon, pathfinding):
-	self.actor = actor
-	self.weapon = weapon
-	self.pathfinding = pathfinding
-	
-	weapon.connect("weapon_fired", shoot)
-	weapon.set_cool_down(1.0)
 
 func set_state(new_state: int):
 	if new_state == current_state:

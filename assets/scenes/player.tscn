@@ -37,6 +37,8 @@ health = 150
 
 [node name="Weapon" parent="Player" instance=ExtResource("5_5m8nb")]
 position = Vector2(33, 0)
+damage = 20
+speed = 4
 
 [node name="BulletManager" type="Node2D" parent="."]
 script = ExtResource("3_hcomu")

@@ -1,89 +1,43 @@
-[gd_scene load_steps=14 format=3 uid="uid://d21l4ym332shf"]
+[gd_scene load_steps=7 format=3 uid="uid://b80kjfljvpbvb"]
 
-[ext_resource type="Script" path="res://assets/scripts/enemy.gd" id="1_2bclh"]
-[ext_resource type="PackedScene" uid="uid://dh65rc30hfv2f" path="res://assets/scenes/heart_container.tscn" id="2_52qht"]
-[ext_resource type="Texture2D" uid="uid://bvnwyjaieeny6" path="res://assets/sprites/BossEnemy.png" id="2_ejo28"]
-[ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="3_2gois"]
-[ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="3_y58eu"]
-[ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_pgkji"]
-[ext_resource type="Script" path="res://assets/scripts/enemy_fighterAI.gd" id="5_6qe3f"]
-[ext_resource type="Script" path="res://assets/scripts/enemy_healthbar.gd" id="5_t12dg"]
-[ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_n5c04"]
+[ext_resource type="PackedScene" uid="uid://6biqldqluklg" path="res://assets/scenes/enemy.tscn" id="1_6id17"]
+[ext_resource type="Texture2D" uid="uid://bvnwyjaieeny6" path="res://assets/sprites/BossEnemy.png" id="2_pp5m8"]
+[ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="3_n733q"]
+[ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="4_3dr24"]
+[ext_resource type="Script" path="res://assets/scripts/enemy_fighterAI.gd" id="5_df1us"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eg66q"]
-bg_color = Color(0.192157, 0.0705882, 0.0588235, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.0475577, 0.0475577, 0.0475576, 1)
+[sub_resource type="CircleShape2D" id="CircleShape2D_5tg4p"]
+radius = 160.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3uo2m"]
-bg_color = Color(0.862745, 0.160784, 0.133333, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.0470588, 0.0470588, 0.0470588, 1)
+[node name="Enemy" instance=ExtResource("1_6id17")]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_sm8x5"]
-radius = 20.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_2qne8"]
-radius = 180.0
-
-[node name="Fighter Enemy" type="CharacterBody2D"]
-script = ExtResource("1_2bclh")
-item_scenes = Array[PackedScene]([ExtResource("2_52qht"), ExtResource("3_y58eu")])
-optimal_range = 1
-move_speed = 120.0
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" parent="CharacterBody2D" index="0"]
 rotation = 1.5708
-scale = Vector2(0.7, 0.7)
-texture = ExtResource("2_ejo28")
+texture = ExtResource("2_pp5m8")
 
-[node name="HealthBar" type="ProgressBar" parent="."]
-custom_minimum_size = Vector2(100, 15)
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -50.0
-offset_top = 50.0
-offset_right = 50.0
-offset_bottom = 65.0
-grow_horizontal = 2
-rotation = -1.5708
-mouse_filter = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_eg66q")
-theme_override_styles/fill = SubResource("StyleBoxFlat_3uo2m")
-value = 100.0
-show_percentage = false
-script = ExtResource("5_t12dg")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_sm8x5")
-
-[node name="Health" parent="." instance=ExtResource("3_2gois")]
-
-[node name="Weapon" parent="." instance=ExtResource("4_pgkji")]
+[node name="Weapon" parent="CharacterBody2D" index="2" instance=ExtResource("3_n733q")]
 position = Vector2(33, 0)
+damage = 10
+speed = 4
 
-[node name="AI" type="Node2D" parent="."]
-script = ExtResource("5_6qe3f")
+[node name="BulletManager" type="Node2D" parent="CharacterBody2D" index="3"]
+script = ExtResource("4_3dr24")
 
-[node name="PlayerDetectionZone" type="Area2D" parent="AI"]
+[node name="AI" type="Node2D" parent="CharacterBody2D" index="4"]
+script = ExtResource("5_df1us")
+optimal_range = 50
+movement_speed = 150
+weapon_cooldown = 0.6
+patrol_range = 50
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="AI/PlayerDetectionZone"]
-shape = SubResource("CircleShape2D_2qne8")
+[node name="PlayerDetectionZone" type="Area2D" parent="CharacterBody2D/AI" index="0"]
 
-[node name="PatrolTimer" type="Timer" parent="AI"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D/AI/PlayerDetectionZone" index="0"]
+shape = SubResource("CircleShape2D_5tg4p")
+
+[node name="PatrolTimer" type="Timer" parent="CharacterBody2D/AI" index="1"]
 wait_time = 3.0
-one_shot = true
 
-[node name="BulletManager" type="Node2D" parent="."]
-script = ExtResource("6_n5c04")
-
-[connection signal="body_entered" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_entered"]
-[connection signal="body_exited" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_exited"]
-[connection signal="timeout" from="AI/PatrolTimer" to="AI" method="_on_patrol_timer_timeout"]
+[connection signal="body_entered" from="CharacterBody2D/AI/PlayerDetectionZone" to="CharacterBody2D/AI" method="_on_player_detection_zone_body_entered"]
+[connection signal="body_exited" from="CharacterBody2D/AI/PlayerDetectionZone" to="CharacterBody2D/AI" method="_on_player_detection_zone_body_exited"]
+[connection signal="timeout" from="CharacterBody2D/AI/PatrolTimer" to="CharacterBody2D/AI" method="_on_patrol_timer_timeout"]

@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="3_ji84n"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lh7ym"]
-radius = 20.0
+radius = 25.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4hjin"]
 bg_color = Color(0.192157, 0.0705882, 0.0588235, 1)
@@ -31,12 +31,12 @@ script = ExtResource("1_aknsn")
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
 script = ExtResource("2_whlyj")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
-shape = SubResource("CircleShape2D_lh7ym")
-
 [node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D"]
 scale = Vector2(0.7, 0.7)
 texture = ExtResource("1_q517i")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
+shape = SubResource("CircleShape2D_lh7ym")
 
 [node name="HealthBar" type="ProgressBar" parent="."]
 custom_minimum_size = Vector2(100, 15)
