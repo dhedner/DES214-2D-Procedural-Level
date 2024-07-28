@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8i3xn5m3jwns"]
+
+[ext_resource type="PackedScene" uid="uid://cahyb42t68n2x" path="res://assets/scenes/enemy_turret.tscn" id="1_tfi00"]
+
+[node name="Enemy" instance=ExtResource("1_tfi00")]
+item_drop_rate = 1.0

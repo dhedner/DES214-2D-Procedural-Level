@@ -1,10 +1,15 @@
 extends Node2D
 
+var enemy_tutorial = preload("res://assets/scenes/enemy_tutorial.tscn")
 var enemy_turret = preload("res://assets/scenes/enemy_turret.tscn")
 var enemy_shooter = preload("res://assets/scenes/enemy_shooter.tscn")
 var enemy_fighter = preload("res://assets/scenes/enemy_fighter.tscn")
+var enemy_tank = preload("res://assets/scenes/enemy_tank.tscn")
 var boss = preload("res://assets/scenes/enemy_boss.tscn")
 var crate = preload("res://assets/scenes/crate.tscn")
+var wall_torch = preload("res://assets/scenes/wall_torch.tscn")
+var ground_torch = preload("res://assets/scenes/ground_torch.tscn")
+var spikes = preload("res://assets/scenes/spikes.tscn")
 var key = preload("res://assets/scenes/key.tscn")
 var health_pickup = preload("res://assets/scenes/health_pickup.tscn")
 var locked_door = preload("res://assets/scenes/door.tscn")
@@ -36,37 +41,35 @@ var terrain_spawn_policies = [
 	}
 ]
 
-var object_spawn_policies = [
+var enemy_spawn_policies = [
 	{
-		"rule_name": "start room",
-		"condition": func(level_manager, room): return room.is_start,
-		"continue_evaluating": false,
-		"spawn_objects": [],
-		"spawn_on_room_complete": [],
-		"on_room_complete_callback": func(room): pass,
-	},
-	{
-		"rule_name": "boss",
+		"rule_name": "boss_enemy",
 		"condition": func(level_manager, room): return room.is_end,
 		"continue_evaluating": false,
-		"spawn_objects": [
+		"spawn_enemies": [
 			{
 				"type": boss,
 				"count": func(level_manager, room): return 1,
 				"placement": PlacementType.CENTER,
 				"destroy_to_complete": true,
+			},
+			{
+				"type": locked_door,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.DOORS,
+				"destroy_to_complete": false,
 			}
 		],
 		"spawn_on_room_complete": [],
 		"on_room_complete_callback": func(room): pass,
 	},
 	{
-		"rule_name": "tutorial",
+		"rule_name": "tutorial_enemy",
 		"condition": func(level_manager, room): return room.room_type == RoomType.TUTORIAL,
 		"continue_evaluating": false,
-		"spawn_objects": [
+		"spawn_enemies": [
 			{
-				"type": enemy_turret,
+				"type": enemy_tutorial,
 				"count": func(level_manager, room): return 1,
 				"placement": PlacementType.CENTER,
 				"destroy_to_complete": true,
@@ -81,6 +84,54 @@ var object_spawn_policies = [
 		],
 		"on_room_complete_callback": func(room): print("Tutorial room completed"),
 	},
+	{
+		"rule_name": "easy_standard_room_enemy_group_type_1",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.33 and randf() < 0.5,
+		"continue_evaluating": false,
+		"spawn_enemies": [
+			{
+				"type": enemy_turret,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.CENTER,
+				"destroy_to_complete": true,
+			},
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "easy_standard_room_type_2",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.33 and randf() < 0.5,
+		"continue_evaluating": false,
+		"spawn_enemies": [
+			{
+				"type": enemy_turret,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"destroy_to_complete": true,
+			},
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	# {
+	# 	"rule_name": "medium_standard_room fallback",
+	# 	"condition": func(level_manager, room): return room.room_type.ON_MAIN_PATH or room.room_type.OFF_MAIN_PATH and room.distance_score < 0.33,
+	# 	"continue_evaluating": false,
+	# 	"spawn_enemies": [
+	# 		{
+	# 			"type": enemy_turret,
+	# 			"count": func(level_manager, room): return 1,
+	# 			"placement": PlacementType.CENTER,
+	# 			"destroy_to_complete": true,
+	# 		}
+	# 	],
+	# }
+]
+
+var object_spawn_policies = [
 ]
 
 func spawn_room_objects(level_manager, room_container):
@@ -96,6 +147,18 @@ func spawn_room_objects(level_manager, room_container):
 			print("terrain rule=", policy["rule_name"], " applies to ", room)
 
 			room.add_terrain_with_policy(level_manager, policy["spawn_terrain"])
+
+			if not policy["continue_evaluating"]:
+				break
+		
+		for policy in enemy_spawn_policies:
+			if not policy["condition"].call(level_manager, room):
+				continue
+
+			print("spawn rule=", policy["rule_name"], " applies to ", room)
+
+			room.spawn_with_policy(level_manager, policy["spawn_enemies"])
+			room.set_cleared_pickup(level_manager, policy["spawn_on_room_complete"], policy["on_room_complete_callback"])
 
 			if not policy["continue_evaluating"]:
 				break
