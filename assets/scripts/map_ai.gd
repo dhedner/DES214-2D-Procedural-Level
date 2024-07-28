@@ -15,6 +15,23 @@ var swift_boots = preload("res://assets/scenes/swift_boots.tscn")
 @onready var pathfinding = $Pathfinding
 @onready var enemy_container = $EnemyContainer
 
+var terrain_spawn_policies = [
+	{
+		"rule_name": "start room floor",
+		"condition": func(level_manager, room): return room.is_start,
+		"continue_evaluating": false,
+		"spawn_terrain": [
+			{
+				"layer": 2,
+				"terrain": 2,
+				"count": func(level_manager, room): return 1000000,
+				"placement": PlacementType.FLOOR,
+				"is_blocking_tiles": false,
+			}
+		]
+	}
+]
+
 var object_spawn_policies = [
 	{
 		"rule_name": "start room",
@@ -62,23 +79,6 @@ var object_spawn_policies = [
 	},
 ]
 
-var terrain_spawn_policies = [
-	{
-		"rule_name": "start room floor",
-		"condition": func(level_manager, room): return room.is_start,
-		"continue_evaluating": false,
-		"spawn_terrain": [
-			{
-				"layer": 2,
-				"terrain": 2,
-				"count": func(level_manager, room): return 1000000,
-				"placement": PlacementType.FLOOR,
-				"is_blocking_tiles": false,
-			}
-		]
-	}
-]
-
 func spawn_room_objects(level_manager):
 	for room in level_manager.room_container.get_children():		
 		for policy in terrain_spawn_policies:
@@ -103,12 +103,6 @@ func spawn_room_objects(level_manager):
 
 			if not policy["continue_evaluating"]:
 				break
-
-
-# func spawn_boss(level_manager):
-# 	var boss_spawn = boss.instantiate()
-# 	add_child(boss_spawn)
-# 	boss_spawn.position = level_manager.end_room.position
 
 # func spawn_enemies(level_manager):
 # 	var eligible_rooms = []

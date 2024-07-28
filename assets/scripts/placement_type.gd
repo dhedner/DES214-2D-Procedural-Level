@@ -1,8 +1,8 @@
 class_name PlacementType
 enum {
 	CENTER,
-	GRID,
 	RANDOM,
 	FLOOR,
+	ALL_FLOOR_GRID_3X3_SPACING,
 	NORTH_WALL
 }
