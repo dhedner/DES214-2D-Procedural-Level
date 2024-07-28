@@ -11,7 +11,6 @@ func make_corridor(_source_room, _destination_room):
 	destination_room = _destination_room
 	source_room.corridors.append(self)
 	destination_room.corridors.append(self)
-	# print("Making corridor between ", source_id, " and ", destination_id)
 
 func generate_corridor_tiles(path):
 	var starting_point = tilemap.local_to_map(Vector2(
