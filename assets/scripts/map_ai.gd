@@ -8,6 +8,9 @@ var crate = preload("res://assets/scenes/crate.tscn")
 var key = preload("res://assets/scenes/key.tscn")
 var health_pickup = preload("res://assets/scenes/health_pickup.tscn")
 var locked_door = preload("res://assets/scenes/door.tscn")
+var heart_container = preload("res://assets/scenes/heart_container.tscn")
+var firerate_pickup = preload("res://assets/scenes/firerate_pickup.tscn")
+var swift_boots = preload("res://assets/scenes/swift_boots.tscn")
 
 @onready var pathfinding = $Pathfinding
 @onready var enemy_container = $EnemyContainer
@@ -72,9 +75,6 @@ func spawn_room_objects(level_manager):
 
 			if not policy["continue_evaluating"]:
 				break
-
-func spawn_gameplay_components():
-	pass
 
 # func spawn_boss(level_manager):
 # 	var boss_spawn = boss.instantiate()

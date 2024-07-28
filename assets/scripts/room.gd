@@ -1,10 +1,6 @@
 extends RigidBody2D
 
 var font = preload("res://assets/fonts/LiberationSans.ttf")
-var heart_container = preload("res://assets/scenes/heart_container.tscn")
-var firerate_pickup = preload("res://assets/scenes/firerate_pickup.tscn")
-var health_pickup = preload("res://assets/scenes/health_pickup.tscn")
-var swift_boots = preload("res://assets/scenes/swift_boots.tscn")
 
 var size
 var is_start = false
@@ -101,7 +97,6 @@ func set_cleared_pickup(level_manager, objects_to_spawn, on_room_complete_callba
 			if on_room_complete_callback:
 				on_room_complete_callback.call(self)
 
-
 func add_floor_tiles(tile_positions, is_corridor):
 	# Add floor tiles to the floor layer
 	tilemap.set_cells_terrain_connect(0, tile_positions, 0, 1)
@@ -192,22 +187,19 @@ func get_local_from_tileset(tile_position):
 	return to_local(tilemap.map_to_local(tile_position))
 
 func get_tiles_for_placement(placement_type, placement_count):
-	var tile_positions = []
-
-	# match placement_type:
-	# 	PlacementType.CENTER:
-
-	# Find the positions in floor_tile_positions that are closest to the center
-	var center = room_position_in_tiles
-	# Copy the array so we can sort it
-	var closest_positions = floor_tile_positions.duplicate()
-	closest_positions.sort_custom(
-		func (a, b): return (a - center).length_squared() < (b - center).length_squared())
-	# Filter out the used positions
-	closest_positions = closest_positions.filter(
+	# Copy & filter out the used positions
+	var tile_positions = floor_tile_positions.filter(
 		func (tile_position): return !used_floor_tile_positions.has(tile_position))
-	tile_positions = closest_positions.slice(0, placement_count)
-	
+
+	match placement_type:
+		PlacementType.CENTER:
+			# Find the positions in floor_tile_positions that are closest to the center
+			var center = room_position_in_tiles
+			tile_positions.sort_custom(
+				func (a, b): return (a - center).length_squared() < (b - center).length_squared())
+
+	tile_positions = tile_positions.slice(0, placement_count)
+
 	# Mark them as used
 	for tile_position in tile_positions:
 		used_floor_tile_positions[tile_position] = true
