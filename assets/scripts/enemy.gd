@@ -8,6 +8,9 @@ class_name Enemy
 @export var item_scenes: Array[PackedScene] = []
 @export var item_drop_rate: float
 
+# Event that is called when the enemy dies
+signal completed
+
 func _ready():
 	print("Enemy ready")
 	# get the pathfinding node from the root of the scene
@@ -18,6 +21,7 @@ func _ready():
 func on_enemy_death():
 	queue_free()
 	drop_item()
+	emit_signal("completed")
 
 func drop_item():
 	if item_scenes.size() == 0:

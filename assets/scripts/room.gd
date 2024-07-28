@@ -11,7 +11,7 @@ var is_start = false
 var is_end = false
 var main_path_index = -1
 var distance_index = -1
-var distance_score = 0.0 # how far this room is from the start
+var distance_score = 0.0 # how far this room is from the start [0.0 -> 1.0]
 var graph_id
 var corridor_count = 0 # does not count cycles
 var is_arena = false
@@ -20,9 +20,11 @@ var is_cramped = false
 var room_size_in_tiles : Vector2i
 var room_position_in_tiles : Vector2i
 var room_top_left : Vector2i
+var used_floor_tile_positions = {}
 var floor_tile_positions = []
 var corridor_tile_positions = []
 var corridors = []
+var objects_for_completion = []
 var room_type
 @onready var tilemap : TileMap = get_tree().get_root().get_node("Main/TileMap")
 
@@ -64,13 +66,41 @@ func spawn_with_policy(level_manager, objects_to_spawn):
 			object_descriptor["count"].call(level_manager, self))
 
 		for tile_position in tile_positions:
-			var pickup_object_instance = object_descriptor["type"].instantiate()
-			add_child(pickup_object_instance)
-			pickup_object_instance.position = get_local_from_tileset(tile_position)
-			print("Spawning ", object_descriptor["type"], " at ", pickup_object_instance.position)
+			var object_instance = object_descriptor["type"].instantiate()
+			add_child(object_instance)
+			object_instance.position = get_local_from_tileset(tile_position)
 
-func set_cleared_pickup(objects_to_spawn):
-	pass
+			if object_descriptor["destroy_to_complete"]:
+				objects_for_completion.append(object_instance)
+
+			print("Spawning ", object_descriptor["type"], " at ", object_instance.position)
+
+func set_cleared_pickup(level_manager, objects_to_spawn, on_room_complete_callback):
+	if len(objects_to_spawn) == 0:
+		return
+
+	# Wait for all objects in objects_for_completion to be completed
+	for object_instance in objects_for_completion:
+		await object_instance.completed
+
+	# Spawn the objects
+	for object_descriptor in objects_to_spawn:
+		# Get eligible tiles for placement
+		var tile_positions = get_tiles_for_placement(
+			object_descriptor["placement"], 
+			object_descriptor["count"].call(level_manager, self))
+
+		for tile_position in tile_positions:
+			var object_instance = object_descriptor["type"].instantiate()
+			add_child(object_instance)
+			object_instance.position = get_local_from_tileset(tile_position)
+
+			print("Spawning ", object_descriptor["type"], " at ", object_instance.position)
+
+			# Call the on_room_complete_callback
+			if on_room_complete_callback:
+				on_room_complete_callback.call(self)
+
 
 func add_floor_tiles(tile_positions, is_corridor):
 	# Add floor tiles to the floor layer
@@ -101,7 +131,7 @@ func pass_1(level_manager):
 		room_type = RoomType.OFF_MAIN_PATH
 
 	# Compute the distance score
-	distance_score = distance_index / level_manager.max_distance_index
+	distance_score = distance_index / float(level_manager.max_distance_index)
 
 	# Set room rectangle parameters
 	var room_size_in_tiles_float = (size / tilemap.tile_set.tile_size.x).floor()
@@ -164,18 +194,25 @@ func get_local_from_tileset(tile_position):
 func get_tiles_for_placement(placement_type, placement_count):
 	var tile_positions = []
 
-	match placement_type:
-		PlacementType.CENTER:
-			# Find the positions in floor_tile_positions that are closest to the center
-			var center = room_position_in_tiles
-			# Copy the array so we can sort it
-			var closest_positions = floor_tile_positions.duplicate()
-			closest_positions.sort_custom(
-				func (a, b): return (a - center).length_squared() < (b - center).length_squared())
-			tile_positions = closest_positions.slice(0, placement_count)
+	# match placement_type:
+	# 	PlacementType.CENTER:
+
+	# Find the positions in floor_tile_positions that are closest to the center
+	var center = room_position_in_tiles
+	# Copy the array so we can sort it
+	var closest_positions = floor_tile_positions.duplicate()
+	closest_positions.sort_custom(
+		func (a, b): return (a - center).length_squared() < (b - center).length_squared())
+	# Filter out the used positions
+	closest_positions = closest_positions.filter(
+		func (tile_position): return !used_floor_tile_positions.has(tile_position))
+	tile_positions = closest_positions.slice(0, placement_count)
 	
-	# Remove them from floor_tile_positions
+	# Mark them as used
 	for tile_position in tile_positions:
-		floor_tile_positions.erase(floor_tile_positions.find(tile_position))
+		used_floor_tile_positions[tile_position] = true
 
 	return tile_positions
+
+func _to_string():
+	return "room id=" + str(graph_id) + " type=" + str(room_type) + " distance_index=" + str(distance_index) + " distance_score=" + str(distance_score)
