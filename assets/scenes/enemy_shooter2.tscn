@@ -21,6 +21,7 @@ script = ExtResource("2_s5ams")
 optimal_range = 200
 movement_speed = 120
 weapon_cooldown = 0.8
+patrol_range = 50
 
 [node name="PlayerDetectionZone" type="Area2D" parent="AI" index="0"]
 

@@ -9,6 +9,7 @@ class_name Enemy
 
 func _ready():
 	print("Enemy ready")
+	# get the pathfinding node from the root of the scene
 	pathfinding = get_node("/root/Pathfinding")
 	healthbar.set_enemy(self)
 	actor.connect("enemy_died", on_enemy_death)
@@ -18,6 +19,8 @@ func on_enemy_death():
 	drop_item()
 
 func drop_item():
+	if item_scenes.size() == 0:
+		return
 	var random_item = item_scenes[randi() % item_scenes.size()]
 	var item_instance = random_item.instantiate()
 	item_instance.position = position

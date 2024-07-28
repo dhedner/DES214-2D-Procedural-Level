@@ -84,4 +84,3 @@ script = ExtResource("6_jgyay")
 
 [node name="Enemy" parent="." instance=ExtResource("6_tn5vu")]
 position = Vector2(341, 0)
-script = null

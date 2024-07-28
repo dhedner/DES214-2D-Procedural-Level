@@ -8,6 +8,7 @@ enum State {
 	ENGAGE
 }
 
+@onready var base_enemy = $".."
 @onready var actor = $"../CharacterBody2D"
 @onready var player_detection_zone = $PlayerDetectionZone
 @onready var patrol_timer = $PatrolTimer
@@ -18,6 +19,7 @@ enum State {
 @export var optimal_range: int
 @export var movement_speed: int
 @export var weapon_cooldown: float
+@export var patrol_range: int
 
 var current_state: int = -1 : set = set_state
 var player = null
@@ -35,6 +37,7 @@ var pathfinding: Pathfinding
 var target : Vector2 = Vector2.ZERO
 
 func _ready():
+	#base_enemy._ready()
 	pathfinding = get_tree().get_current_scene().get_node("./Pathfinding")
 	self.origin = actor.global_position
 
@@ -48,15 +51,15 @@ func _ready():
 	set_state(State.PATROL)
 	
 func _draw():
-	# pass
+	pass
 	# draw detection zone with an alpha of 0.5
 	# draw_circle(Vector2.ZERO, detection_shape.radius, Color(1, 0, 0, 0.5))
-	draw_circle(to_local(origin), 11, Color(1, 0, 1))
-	draw_circle(Vector2.ZERO, 11, Color(0, 1, 0))
-	draw_circle(to_local(patrol_location), 8, Color(0, 1, 1))	
-	draw_circle(to_local(target), 5, Color(0, 0, 1))
-	draw_line(Vector2.ZERO, to_local(patrol_location), Color(1, 1, 0), 15, true)
-
+	#draw_circle(to_local(origin), 11, Color(1, 0, 1))
+	#draw_circle(Vector2.ZERO, 11, Color(0, 1, 0))
+	#draw_circle(to_local(patrol_location), 8, Color(0, 1, 1))	
+	#draw_circle(to_local(target), 5, Color(0, 0, 1))
+	#draw_line(Vector2.ZERO, to_local(patrol_location), Color(1, 1, 0), 15, true)
+	
 func _process(delta):
 	queue_redraw()	
 
@@ -144,7 +147,6 @@ func _on_player_detection_zone_body_exited(body):
 		player = null
 
 func _on_patrol_timer_timeout():
-	var patrol_range = 50
 	var random_x = randf_range(-patrol_range, patrol_range)
 	var random_y = randf_range(-patrol_range, patrol_range)
 	patrol_location = Vector2(random_x, random_y) + origin
