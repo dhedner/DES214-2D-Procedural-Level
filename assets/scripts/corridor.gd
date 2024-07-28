@@ -1,35 +1,37 @@
 extends Node2D
 
-var start_position
-var end_position
-var source_graph_id
-var destination_graph_id
+var source_room
+var destination_room
 var locked = false
 
-func make_corridor(source_id, source_position, destination_id, destination_position):
-	start_position = source_position
-	source_graph_id = source_id
-	end_position = destination_position
-	destination_graph_id = destination_id
+var tilemap : TileMap
+
+func _ready():
+	tilemap = get_tree().get_root().get_node("Main/TileMap")
+
+func make_corridor(_source_room, _destination_room):
+	source_room = _source_room
+	destination_room = _destination_room
 	# print("Making corridor between ", source_id, " and ", destination_id)
 
-func generate_corridor_tiles(tilemap, path):
+func generate_corridor_tiles(path):
 	var starting_point = tilemap.local_to_map(Vector2(
-		path.get_point_position(source_graph_id).x, 
-		path.get_point_position(source_graph_id).y))
+		path.get_point_position(source_room.graph_id).x, 
+		path.get_point_position(source_room.graph_id).y))
 	var ending_point = tilemap.local_to_map(Vector2(
-		path.get_point_position(destination_graph_id).x, 
-		path.get_point_position(destination_graph_id).y))
+		path.get_point_position(destination_room.graph_id).x, 
+		path.get_point_position(destination_room.graph_id).y))
 
 	# Carve a path between two points
 	var difference_x = sign(ending_point.x - starting_point.x)
 	var difference_y = sign(ending_point.y - starting_point.y)
 	
+	# They are on the same x/y axis, so pick a random direction
 	if difference_x == 0:
 		difference_x = pow(-1.0, randi() % 2)
 	if difference_y == 0:
 		difference_y = pow(-1.0, randi() % 2)
-	
+
 	# Choose either x/y or y/x
 	var x_over_y = starting_point
 	var y_over_x = ending_point
@@ -49,10 +51,5 @@ func generate_corridor_tiles(tilemap, path):
 		corridor_tiles.append(Vector2i(y_over_x.x, y))
 		corridor_tiles.append(Vector2i(y_over_x.x + difference_x, y))
 
-	for tile in corridor_tiles:
-		# Clear collisions 
-		tilemap.set_cell(1, tile, -1)
-
-	# Set floor tiles
-	tilemap.set_cells_terrain_connect(0, corridor_tiles, 0, 1)
-	tilemap.set_cells_terrain_connect(1, corridor_tiles, 0, -1)
+	source_room.add_corridor_tiles(corridor_tiles)
+	destination_room.add_corridor_tiles(corridor_tiles)
