@@ -6,6 +6,7 @@ class_name Enemy
 
 @export var pathfinding: Pathfinding
 @export var item_scenes: Array[PackedScene] = []
+@export var item_drop_rate: float
 
 func _ready():
 	print("Enemy ready")
@@ -21,7 +22,9 @@ func on_enemy_death():
 func drop_item():
 	if item_scenes.size() == 0:
 		return
-	var random_item = item_scenes[randi() % item_scenes.size()]
-	var item_instance = random_item.instantiate()
-	item_instance.position = position
-	get_parent().add_child(item_instance)
+	
+	if randf() > item_drop_rate:
+		var random_item = item_scenes[randi() % item_scenes.size()]
+		var item_instance = random_item.instantiate()
+		item_instance.position = position
+		get_parent().add_child(item_instance)

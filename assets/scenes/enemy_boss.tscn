@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://cjpoc7bhl5u0o"]
+[gd_scene load_steps=9 format=3 uid="uid://cjpoc7bhl5u0o"]
 
 [ext_resource type="PackedScene" uid="uid://6biqldqluklg" path="res://assets/scenes/enemy.tscn" id="1_fyjvv"]
 [ext_resource type="Texture2D" uid="uid://bvnwyjaieeny6" path="res://assets/sprites/BossEnemy.png" id="2_voetn"]
+[ext_resource type="PackedScene" uid="uid://dem64yabda4mb" path="res://assets/scenes/level_exit.tscn" id="2_wlbbi"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="4_0jkjl"]
 [ext_resource type="Script" path="res://assets/scripts/enemy_bossAI.gd" id="5_afyrw"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="6_pp5wo"]
@@ -13,7 +14,7 @@ radius = 30.0
 radius = 200.0
 
 [node name="Enemy" instance=ExtResource("1_fyjvv")]
-scale = Vector2(1.5, 1.5)
+item_scenes = Array[PackedScene]([ExtResource("2_wlbbi")])
 
 [node name="Sprite2D" parent="CharacterBody2D" index="0"]
 rotation = 1.5708

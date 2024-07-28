@@ -8,11 +8,11 @@ enum State {
 	ENGAGE
 }
 
-@onready var actor = $"../CharacterBody2D"
+@onready var actor = $".."
 @onready var player_detection_zone = $PlayerDetectionZone
 @onready var patrol_timer = $PatrolTimer
-@onready var bullet_manager = $"../CharacterBody2D/BulletManager"
-@onready var weapon = $"../CharacterBody2D/Weapon"
+@onready var bullet_manager = $"../../BulletManager"
+@onready var weapon = $"../Weapon"
 
 @export var weapon_cooldown: float
 @export var patrol_range: int

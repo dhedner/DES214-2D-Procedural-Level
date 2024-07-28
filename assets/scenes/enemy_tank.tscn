@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://dqoe7pmwtj3lu"]
+[gd_scene load_steps=9 format=3 uid="uid://dqoe7pmwtj3lu"]
 
 [ext_resource type="PackedScene" uid="uid://6biqldqluklg" path="res://assets/scenes/enemy.tscn" id="1_qkcas"]
+[ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="2_gt32h"]
 [ext_resource type="Texture2D" uid="uid://bvnwyjaieeny6" path="res://assets/sprites/BossEnemy.png" id="2_nag0k"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="3_ay23v"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="4_xe4rr"]
@@ -13,6 +14,8 @@ radius = 30.0
 radius = 200.0
 
 [node name="Enemy" instance=ExtResource("1_qkcas")]
+item_scenes = Array[PackedScene]([ExtResource("2_gt32h")])
+item_drop_rate = 0.2
 
 [node name="Sprite2D" parent="CharacterBody2D" index="0"]
 rotation = 1.5708
@@ -27,10 +30,7 @@ position = Vector2(40, 0)
 damage = 20
 speed = 2
 
-[node name="BulletManager" type="Node2D" parent="CharacterBody2D" index="3"]
-script = ExtResource("4_xe4rr")
-
-[node name="AI" type="Node2D" parent="CharacterBody2D" index="4"]
+[node name="AI" type="Node2D" parent="CharacterBody2D" index="3"]
 script = ExtResource("5_3vl0s")
 optimal_range = 100
 movement_speed = 30
@@ -48,6 +48,9 @@ wait_time = 3.0
 [node name="Health" parent="." index="2"]
 max_health = 200
 health = 200
+
+[node name="BulletManager" type="Node2D" parent="." index="3"]
+script = ExtResource("4_xe4rr")
 
 [connection signal="body_entered" from="CharacterBody2D/AI/PlayerDetectionZone" to="CharacterBody2D/AI" method="_on_player_detection_zone_body_entered"]
 [connection signal="body_exited" from="CharacterBody2D/AI/PlayerDetectionZone" to="CharacterBody2D/AI" method="_on_player_detection_zone_body_exited"]

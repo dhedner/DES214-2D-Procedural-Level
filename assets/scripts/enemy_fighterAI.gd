@@ -11,7 +11,7 @@ enum State {
 @onready var actor = $".."
 @onready var player_detection_zone = $PlayerDetectionZone
 @onready var patrol_timer = $PatrolTimer
-@onready var bullet_manager = $"../BulletManager"
+@onready var bullet_manager = $"../../BulletManager"
 @onready var weapon = $"../Weapon"
 
 

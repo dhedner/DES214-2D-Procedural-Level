@@ -1,11 +1,14 @@
 extends StaticBody2D
 
+@export var sprites: Array[Texture] = []
 @export var item_scenes: Array[PackedScene] = []
 @export var drop_chance: float = 0.4
 @export var health: int = 10
 
 func _ready():
-	pass
+	if sprites.size() > 0:
+		var sprite = sprites[randi() % sprites.size()]
+		$Sprite2D.texture = sprite
 
 func handle_hit(amount: int):
 	if health - amount <= 0:

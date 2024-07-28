@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://cahyb42t68n2x"]
+[gd_scene load_steps=7 format=3 uid="uid://cahyb42t68n2x"]
 
 [ext_resource type="PackedScene" uid="uid://6biqldqluklg" path="res://assets/scenes/enemy.tscn" id="1_a45rv"]
+[ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="2_skd7x"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="3_ix23b"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="4_1bc3l"]
 [ext_resource type="Script" path="res://assets/scripts/enemy_turretAI.gd" id="5_i3s6b"]
@@ -9,6 +10,8 @@
 radius = 160.0
 
 [node name="Enemy" instance=ExtResource("1_a45rv")]
+item_scenes = Array[PackedScene]([ExtResource("2_skd7x")])
+item_drop_rate = 0.8
 
 [node name="Sprite2D" parent="CharacterBody2D" index="0"]
 rotation = 1.5708
@@ -18,22 +21,22 @@ position = Vector2(33, 0)
 damage = 10
 speed = 3
 
-[node name="BulletManager" type="Node2D" parent="CharacterBody2D" index="3"]
-script = ExtResource("4_1bc3l")
-
-[node name="AI" type="Node2D" parent="." index="3"]
+[node name="AI" type="Node2D" parent="CharacterBody2D" index="3"]
 script = ExtResource("5_i3s6b")
 weapon_cooldown = 1.0
 patrol_range = 60
 
-[node name="PlayerDetectionZone" type="Area2D" parent="AI" index="0"]
+[node name="PlayerDetectionZone" type="Area2D" parent="CharacterBody2D/AI" index="0"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="AI/PlayerDetectionZone" index="0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D/AI/PlayerDetectionZone" index="0"]
 shape = SubResource("CircleShape2D_5tg4p")
 
-[node name="PatrolTimer" type="Timer" parent="AI" index="1"]
+[node name="PatrolTimer" type="Timer" parent="CharacterBody2D/AI" index="1"]
 wait_time = 3.0
 
-[connection signal="body_entered" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_entered"]
-[connection signal="body_exited" from="AI/PlayerDetectionZone" to="AI" method="_on_player_detection_zone_body_exited"]
-[connection signal="timeout" from="AI/PatrolTimer" to="AI" method="_on_patrol_timer_timeout"]
+[node name="BulletManager" type="Node2D" parent="." index="3"]
+script = ExtResource("4_1bc3l")
+
+[connection signal="body_entered" from="CharacterBody2D/AI/PlayerDetectionZone" to="CharacterBody2D/AI" method="_on_player_detection_zone_body_entered"]
+[connection signal="body_exited" from="CharacterBody2D/AI/PlayerDetectionZone" to="CharacterBody2D/AI" method="_on_player_detection_zone_body_exited"]
+[connection signal="timeout" from="CharacterBody2D/AI/PatrolTimer" to="CharacterBody2D/AI" method="_on_patrol_timer_timeout"]

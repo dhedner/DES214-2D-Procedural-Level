@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://bh7q7nglw35hj" path="res://assets/sprites/Treasure.png" id="2_vlo43"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_p3st1"]
+radius = 38.0
 
 [node name="Area2D" type="Area2D"]
 script = ExtResource("1_qwnk8")
@@ -12,6 +13,7 @@ script = ExtResource("1_qwnk8")
 shape = SubResource("CircleShape2D_p3st1")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(2, 2)
 texture = ExtResource("2_vlo43")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
