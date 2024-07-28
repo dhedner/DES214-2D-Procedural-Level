@@ -59,7 +59,8 @@ func spawn_with_policy(level_manager, objects_to_spawn):
 	for object_descriptor in objects_to_spawn:
 		var tile_positions = get_tiles_for_placement(
 			object_descriptor["placement"], 
-			object_descriptor["count"].call(level_manager, self))
+			object_descriptor["count"].call(level_manager, self),
+			true)
 
 		for tile_position in tile_positions:
 			var object_instance = object_descriptor["type"].instantiate()
@@ -70,6 +71,21 @@ func spawn_with_policy(level_manager, objects_to_spawn):
 				objects_for_completion.append(object_instance)
 
 			print("Spawning ", object_descriptor["type"], " at ", object_instance.position)
+
+func add_terrain_with_policy(level_manager, terrain_to_spawn):
+	for terrain_descriptor in terrain_to_spawn:
+		var tile_positions = get_tiles_for_placement(
+			terrain_descriptor["placement"], 
+			terrain_descriptor["count"].call(level_manager, self),
+			terrain_descriptor["is_blocking_tiles"])
+
+		tilemap.set_cells_terrain_connect(
+			terrain_descriptor["layer"], 
+			tile_positions, 
+			0,
+			terrain_descriptor["terrain"])
+
+		print("Spawning terrain=", terrain_descriptor["terrain"], " layer=", terrain_descriptor["layer"], " count=", tile_positions.size())
 
 func set_cleared_pickup(level_manager, objects_to_spawn, on_room_complete_callback):
 	if len(objects_to_spawn) == 0:
@@ -84,7 +100,8 @@ func set_cleared_pickup(level_manager, objects_to_spawn, on_room_complete_callba
 		# Get eligible tiles for placement
 		var tile_positions = get_tiles_for_placement(
 			object_descriptor["placement"], 
-			object_descriptor["count"].call(level_manager, self))
+			object_descriptor["count"].call(level_manager, self),
+			true)
 
 		for tile_position in tile_positions:
 			var object_instance = object_descriptor["type"].instantiate()
@@ -186,12 +203,19 @@ func make_l_shaped(level_manager):
 func get_local_from_tileset(tile_position):
 	return to_local(tilemap.map_to_local(tile_position))
 
-func get_tiles_for_placement(placement_type, placement_count):
+func get_tiles_for_placement(placement_type, placement_count, blocks_tiles):
 	# Copy & filter out the used positions
 	var tile_positions = floor_tile_positions.filter(
 		func (tile_position): return !used_floor_tile_positions.has(tile_position))
 
 	match placement_type:
+		PlacementType.RANDOM:
+			# Shuffle the positions
+			tile_positions.shuffle()
+
+		PlacementType.FLOOR:
+			pass
+
 		PlacementType.CENTER:
 			# Find the positions in floor_tile_positions that are closest to the center
 			var center = room_position_in_tiles
@@ -201,8 +225,9 @@ func get_tiles_for_placement(placement_type, placement_count):
 	tile_positions = tile_positions.slice(0, placement_count)
 
 	# Mark them as used
-	for tile_position in tile_positions:
-		used_floor_tile_positions[tile_position] = true
+	if blocks_tiles:
+		for tile_position in tile_positions:
+			used_floor_tile_positions[tile_position] = true
 
 	return tile_positions
 

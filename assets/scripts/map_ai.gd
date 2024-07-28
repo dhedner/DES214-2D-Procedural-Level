@@ -15,7 +15,7 @@ var swift_boots = preload("res://assets/scenes/swift_boots.tscn")
 @onready var pathfinding = $Pathfinding
 @onready var enemy_container = $EnemyContainer
 
-var placement_policies = [
+var object_spawn_policies = [
 	{
 		"rule_name": "start room",
 		"condition": func(level_manager, room): return room.is_start,
@@ -62,19 +62,48 @@ var placement_policies = [
 	},
 ]
 
+var terrain_spawn_policies = [
+	{
+		"rule_name": "start room floor",
+		"condition": func(level_manager, room): return room.is_start,
+		"continue_evaluating": false,
+		"spawn_terrain": [
+			{
+				"layer": 2,
+				"terrain": 2,
+				"count": func(level_manager, room): return 1000000,
+				"placement": PlacementType.FLOOR,
+				"is_blocking_tiles": false,
+			}
+		]
+	}
+]
+
 func spawn_room_objects(level_manager):
-	for room in level_manager.room_container.get_children():
-		for policy in placement_policies:
+	for room in level_manager.room_container.get_children():		
+		for policy in terrain_spawn_policies:
 			if not policy["condition"].call(level_manager, room):
 				continue
 
-			print("rule=", policy["rule_name"], " applies to ", room)
+			print("terrain rule=", policy["rule_name"], " applies to ", room)
+
+			room.add_terrain_with_policy(level_manager, policy["spawn_terrain"])
+
+			if not policy["continue_evaluating"]:
+				break
+
+		for policy in object_spawn_policies:
+			if not policy["condition"].call(level_manager, room):
+				continue
+
+			print("spawn rule=", policy["rule_name"], " applies to ", room)
 
 			room.spawn_with_policy(level_manager, policy["spawn_objects"])
 			room.set_cleared_pickup(level_manager, policy["spawn_on_room_complete"], policy["on_room_complete_callback"])
 
 			if not policy["continue_evaluating"]:
 				break
+
 
 # func spawn_boss(level_manager):
 # 	var boss_spawn = boss.instantiate()
