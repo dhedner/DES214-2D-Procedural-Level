@@ -12,7 +12,6 @@ class_name Enemy
 signal completed
 
 func _ready():
-	print("Enemy ready")
 	# get the pathfinding node from the root of the scene
 	pathfinding = get_node("/root/Pathfinding")
 	healthbar.set_enemy(self)

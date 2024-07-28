@@ -1,10 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://dem64yabda4mb"]
+[gd_scene load_steps=6 format=3 uid="uid://dem64yabda4mb"]
 
 [ext_resource type="Script" path="res://assets/scripts/level_exit.gd" id="1_qwnk8"]
 [ext_resource type="Texture2D" uid="uid://bh7q7nglw35hj" path="res://assets/sprites/Treasure.png" id="2_vlo43"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_p3st1"]
 radius = 38.0
+
+[sub_resource type="Gradient" id="Gradient_cul30"]
+offsets = PackedFloat32Array(0.371495, 0.549065, 0.815421)
+colors = PackedColorArray(1, 1, 1, 1, 0.520161, 0.520161, 0.520161, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_radcb"]
+gradient = SubResource("Gradient_cul30")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
 
 [node name="Area2D" type="Area2D"]
 script = ExtResource("1_qwnk8")
@@ -15,5 +24,11 @@ shape = SubResource("CircleShape2D_p3st1")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(2, 2)
 texture = ExtResource("2_vlo43")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+color = Color(0.989158, 0.828803, 0.51289, 1)
+energy = 0.7
+texture = SubResource("GradientTexture2D_radcb")
+texture_scale = 2.0
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

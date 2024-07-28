@@ -13,7 +13,7 @@ enum State {
 @onready var patrol_timer = $PatrolTimer
 @onready var bullet_manager = $"../../BulletManager"
 @onready var weapon = $"../Weapon"
-
+@onready var light = $"../PointLight2D"
 
 @export var optimal_range: int
 @export var movement_speed: int
@@ -34,6 +34,8 @@ var original_shape_radius: float = 0.0
 
 var pathfinding: Pathfinding
 var target : Vector2 = Vector2.ZERO
+var patrol_light_color : Color
+var engage_light_color : Color = Color.RED
 
 func _ready():
 	pathfinding = get_tree().get_current_scene().get_node("./Pathfinding")
@@ -41,6 +43,7 @@ func _ready():
 
 	detection_shape = player_detection_zone.shape_owner_get_shape(0, 0) as CircleShape2D
 	original_shape_radius = detection_shape.radius
+	patrol_light_color = light.color
 
 	enemy_fired_bullet.connect(Callable(bullet_manager, "handle_bullet_spawned"))
 	weapon.connect("weapon_fired", shoot)
@@ -49,16 +52,21 @@ func _ready():
 	set_state(State.PATROL)
 	
 func _draw():
-	draw_circle(position, detection_shape.radius, Color(1, 0, 0, 0.5))
+	pass
+	# draw_circle(position, detection_shape.radius, Color(1, 0, 0, 0.5))
 	
 func _process(delta):
 	queue_redraw()	
 
 func _physics_process(delta):
+	# interpolate the light's texture scale based on the detection shape's radius
+	light.texture_scale = lerpf(light.texture_scale, detection_shape.radius / 30, 0.1)
+
 	match current_state:
 		State.PATROL:
 			pass
 		State.ENGAGE:
+			light.color = engage_light_color.lerp(patrol_light_color, 0.1)
 			if player != null:
 				var path = pathfinding.get_new_path(actor.global_position, player.global_position)
 				var min_optimal = optimal_range * 0.8

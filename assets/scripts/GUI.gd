@@ -24,9 +24,8 @@ func set_new_health_value(new_health: int):
 	var health_tween = create_tween()
 
 	health_tween.tween_property(health_bar, "value", new_health, 0.3).set_ease(Tween.EASE_IN).set_delay(Tween.TRANS_LINEAR)
-	if player.connect("player_health_changed", Callable(self, "set_new_health_value")):
-		health_tween.tween_property(bar_style, "bg_color", highlighter_color, 0.2).set_ease(Tween.EASE_IN).set_delay(Tween.TRANS_LINEAR)
-		health_tween.tween_property(bar_style, "bg_color", original_color, 0.2).set_ease(Tween.EASE_OUT).set_delay(Tween.TRANS_LINEAR)
+	health_tween.tween_property(bar_style, "bg_color", highlighter_color, 0.2).set_ease(Tween.EASE_IN).set_delay(Tween.TRANS_LINEAR)
+	health_tween.tween_property(bar_style, "bg_color", original_color, 0.2).set_ease(Tween.EASE_OUT).set_delay(Tween.TRANS_LINEAR)
 
 func set_new_max_health(new_max_health: int):
 	health_bar.max_value = new_max_health

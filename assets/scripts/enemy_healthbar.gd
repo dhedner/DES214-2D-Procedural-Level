@@ -6,6 +6,7 @@ extends ProgressBar
 
 func _ready():
 	set_new_health_value(health.max_health)
+	max_value = health.max_health
 	enemy_actor.connect("enemy_health_changed", set_new_health_value)
 
 func _process(delta):

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://c1ybel7dksmf0"]
+[gd_scene load_steps=10 format=3 uid="uid://c1ybel7dksmf0"]
 
 [ext_resource type="PackedScene" uid="uid://6biqldqluklg" path="res://assets/scenes/enemy.tscn" id="1_gbvye"]
 [ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="2_ntgsj"]
@@ -9,6 +9,15 @@
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5tg4p"]
 radius = 160.0
+
+[sub_resource type="Gradient" id="Gradient_k65ob"]
+offsets = PackedFloat32Array(0.46729, 0.544393, 0.661215)
+colors = PackedColorArray(1, 1, 1, 1, 0.520161, 0.520161, 0.520161, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_3mr4m"]
+gradient = SubResource("Gradient_k65ob")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
 
 [node name="Enemy" instance=ExtResource("1_gbvye")]
 item_scenes = Array[PackedScene]([ExtResource("2_ntgsj")])
@@ -37,6 +46,16 @@ shape = SubResource("CircleShape2D_5tg4p")
 
 [node name="PatrolTimer" type="Timer" parent="CharacterBody2D/AI" index="1"]
 wait_time = 3.0
+
+[node name="PointLight2D" type="PointLight2D" parent="CharacterBody2D" index="4"]
+color = Color(0.989158, 0.828803, 0.51289, 1)
+energy = 0.7
+texture = SubResource("GradientTexture2D_3mr4m")
+texture_scale = 2.0
+
+[node name="Health" parent="." index="2"]
+max_health = 160
+health = 160
 
 [node name="BulletManager" type="Node2D" parent="." index="3"]
 script = ExtResource("4_ipode")

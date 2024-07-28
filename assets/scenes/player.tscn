@@ -1,10 +1,19 @@
-[gd_scene load_steps=7 format=3 uid="uid://c51wqe5hc7j1k"]
+[gd_scene load_steps=9 format=3 uid="uid://c51wqe5hc7j1k"]
 
 [ext_resource type="Script" path="res://assets/scripts/player.gd" id="1_feuro"]
 [ext_resource type="Texture2D" uid="uid://bst4mmqjqar05" path="res://assets/sprites/Hero.png" id="2_nkilj"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="3_hcomu"]
 [ext_resource type="PackedScene" uid="uid://djd50o8gfwkd7" path="res://assets/scenes/health.tscn" id="4_7t0nk"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="5_5m8nb"]
+
+[sub_resource type="Gradient" id="Gradient_jveji"]
+offsets = PackedFloat32Array(0.46729, 0.544393, 0.661215)
+colors = PackedColorArray(1, 1, 1, 1, 0.520161, 0.520161, 0.520161, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_v0124"]
+gradient = SubResource("Gradient_jveji")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ogygc"]
 radius = 15.0
@@ -14,6 +23,12 @@ radius = 15.0
 [node name="Player" type="CharacterBody2D" parent="."]
 script = ExtResource("1_feuro")
 move_speed = 170.0
+
+[node name="PointLight2D" type="PointLight2D" parent="Player"]
+color = Color(0.989158, 0.828803, 0.51289, 1)
+energy = 0.7
+texture = SubResource("GradientTexture2D_v0124")
+texture_scale = 2.0
 
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Player"]
 remote_path = NodePath("../Camera2D")
