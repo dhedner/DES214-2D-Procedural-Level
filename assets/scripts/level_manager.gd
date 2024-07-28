@@ -70,10 +70,6 @@ func make_rooms(tilemap: TileMap):
 		return false
 
 	assign_distance_index()
-
-	# Second pass of room generation now that the base tiles are set
-	for room in $Rooms.get_children():
-		room.pass_2(self)
 	
 	return true
 

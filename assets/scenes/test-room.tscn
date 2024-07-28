@@ -9,3 +9,4 @@ num_rooms = 4
 x_bias = 0
 y_bias = 0
 path_cycles = 0
+column_probability = 1.0
