@@ -12,6 +12,11 @@ func make_corridor(_source_room, _destination_room):
 	source_room.corridors.append(self)
 	destination_room.corridors.append(self)
 
+	if source_room.is_end:
+		destination_room.is_leading_to_end = true
+	if destination_room.is_end:
+		source_room.is_leading_to_end = true
+
 func generate_corridor_tiles(path):
 	var starting_point = tilemap.local_to_map(Vector2(
 		path.get_point_position(source_room.graph_id).x, 

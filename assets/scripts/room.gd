@@ -5,6 +5,7 @@ var font = preload("res://assets/fonts/LiberationSans.ttf")
 var size
 var is_start = false
 var is_end = false
+var is_leading_to_end = false
 var main_path_index = -1
 var distance_index = -1
 var distance_score = 0.0 # how far this room is from the start [0.0 -> 1.0]
@@ -80,27 +81,31 @@ func make_room(_position, _size):
 
 func spawn_with_policy(level_manager, objects_to_spawn):
 	for object_descriptor in objects_to_spawn:
-		var tile_positions = get_tiles_for_placement(
-			object_descriptor["placement"], 
-			object_descriptor["count"].call(level_manager, self),
-			true)
+		var types_to_spawn = []
+		var tile_positions = []
+		if object_descriptor["type"] is Callable:
+			types_to_spawn = object_descriptor["type"].call(level_manager, self)
+			tile_positions = get_tiles_for_placement(
+				object_descriptor["placement"], 
+				len(types_to_spawn),
+				true)
+		else:
+			tile_positions = get_tiles_for_placement(
+				object_descriptor["placement"], 
+				object_descriptor["count"].call(level_manager, self),
+				true)
+			types_to_spawn.append(object_descriptor["type"])
 
-		for tile_position in tile_positions:
-			var types_to_spawn = []
-			if object_descriptor["type"] is Callable:
-				types_to_spawn = object_descriptor["type"].call(level_manager, self)
-			else:
-				types_to_spawn.append(object_descriptor["type"])
+		for i in range(len(tile_positions)):
+			# Cycle through the types if there are more than 1
+			var object_instance = types_to_spawn[i % len(types_to_spawn)].instantiate()
+			add_child(object_instance)
+			object_instance.position = get_local_from_tileset(tile_positions[i])
 
-			for type_to_spawn in types_to_spawn:
-				var object_instance = type_to_spawn.instantiate()
-				add_child(object_instance)
-				object_instance.position = get_local_from_tileset(tile_position)
+			if object_descriptor["destroy_to_complete"]:
+				objects_for_completion.append(object_instance)
 
-				if object_descriptor["destroy_to_complete"]:
-					objects_for_completion.append(object_instance)
-
-				print("Spawning ", object_descriptor["type"], " at ", object_instance.position)
+			print("Spawning ", object_descriptor["type"], " at ", object_instance.position)
 
 func add_terrain_with_policy(level_manager, terrain_to_spawn):
 	for terrain_descriptor in terrain_to_spawn:

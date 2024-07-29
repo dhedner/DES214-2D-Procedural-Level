@@ -437,6 +437,20 @@ var enemy_spawn_policies = [
 
 var object_spawn_policies = [
 	{
+		"rule_name": "treasure_room_last_resort",
+		"condition": func(level_manager, room): return room.is_leading_to_end and len(treasures) > 0,
+		"continue_evaluating": true,
+		"spawn_objects": [
+			{
+				"type": func(level_manager, room): return treasures,
+				"placement": PlacementType.CENTER,
+				"destroy_to_complete": false,
+			},
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
 		"rule_name": "easy_standard_room_object_group_type_1",
 		"condition": func(level_manager, room): 
 			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.33 and randf() < 0.5,
