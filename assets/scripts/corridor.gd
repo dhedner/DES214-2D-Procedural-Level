@@ -50,4 +50,5 @@ func generate_corridor_tiles(path):
 		corridor_tiles.append(Vector2i(y_over_x.x + difference_x, y))
 
 	source_room.add_corridor_tiles(corridor_tiles)
+	source_room.add_floor_tiles(corridor_tiles, true)
 	destination_room.add_corridor_tiles(corridor_tiles)

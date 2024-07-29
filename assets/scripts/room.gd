@@ -25,7 +25,7 @@ var door_tile_positions = []
 var corridors = []
 var objects_for_completion = []
 var pickups_for_completion = []
-var room_type
+var room_type = RoomType.UNKNOWN
 @onready var tilemap : TileMap = get_tree().get_root().get_node("Main/TileMap")
 
 var corner_rect = Rect2i()
@@ -40,16 +40,34 @@ var room_colors = {
 	RoomType.TUTORIAL: Color(1, 0, 1, 0.3), # Magenta
 }
 
+@export var draw_debug = false
+
 func _draw():
-	pass
+	if not draw_debug or room_type == RoomType.UNKNOWN:
+		return
+	
 	# Draw the room rectangle
-	# draw_rect(Rect2(Vector2(-size.x / 2, -size.y / 2), Vector2(size.x, size.y)), room_colors[room_type])
+	draw_rect(Rect2(
+		get_local_from_tileset(room_rect.position),
+		room_rect.size * tilemap.tile_set.tile_size),
+		room_colors[room_type])
 
-	# draw_rect(debug_corner_rect, Color(1, 0, 0, 0.3))
+	# Draw the room safe rectangle
+	draw_rect(Rect2(
+		get_local_from_tileset(room_safe_rect.position),
+		room_safe_rect.size * tilemap.tile_set.tile_size),
+		Color(1, 1, 1, 0.2))
+	
+	# Draw corner rect
+	draw_rect(debug_corner_rect, Color(1, 0, 0, 0.1))
 
-func _process(_delta):
-	pass
-	# queue_redraw()
+	# Draw the door tiles
+	for tile_position in door_tile_positions:
+		var tile_local_position = get_local_from_tileset(tile_position)
+		draw_rect(Rect2(tile_local_position, tilemap.tile_set.tile_size), Color(1, 1, 1, 0.5))
+
+func _process(delta):
+	queue_redraw()
 
 func make_room(_position, _size):
 	position = _position
@@ -183,9 +201,8 @@ func compute_floor_tiles():
 	add_floor_tiles(floor_tile_positions, false)
 
 func add_corridor_tiles(corridor_tiles):
-	add_floor_tiles(corridor_tiles, true)
-
 	# Add corridor tiles to corridor_tile_positions if they are part of the floor
+	var created_door_tiles = []
 	for tile_position in corridor_tiles:
 		if floor_tile_positions.find(tile_position) == -1:
 			continue
@@ -194,7 +211,9 @@ func add_corridor_tiles(corridor_tiles):
 
 		# Get the "door" tiles that are in the room rect but not in the safe room rect
 		if room_rect.has_point(tile_position) and !room_safe_rect.has_point(tile_position):
-			door_tile_positions.append(tile_position)
+			created_door_tiles.append(tile_position)
+
+	door_tile_positions.append_array(created_door_tiles)
 
 func make_l_shaped(level_manager):
 	# Check if this room should be L-shaped
@@ -242,6 +261,9 @@ func get_tiles_for_placement(placement_type, placement_count, blocks_tiles):
 
 		PlacementType.NORTH_WALL:
 			pass
+
+		PlacementType.DOORS:
+			tile_positions = door_tile_positions.filter(func (tile_position): return !used_floor_tile_positions.has(tile_position))
 
 		PlacementType.ALL_FLOOR_GRID_3X3_SPACING:
 			# Filter out the positions that are not in a 3x3 grid

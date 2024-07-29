@@ -1,5 +1,6 @@
 class_name RoomType 
 enum {
+	UNKNOWN,
 	START,
 	END,
 	ARENA,
