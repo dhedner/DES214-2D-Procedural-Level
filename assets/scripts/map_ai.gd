@@ -458,7 +458,7 @@ var object_spawn_policies = [
 		"spawn_objects": [
 			{
 				"type": wall_torch,
-				"count": func(level_manager, room): return 1,
+				"count": func(level_manager, room): return 1000000,
 				"placement": PlacementType.NORTH_WALL,
 				"destroy_to_complete": false,
 			},
@@ -508,7 +508,7 @@ var object_spawn_policies = [
 			},
 			{
 				"type": wall_torch,
-				"count": func(level_manager, room): return 2,
+				"count": func(level_manager, room): return 1000000,
 				"placement": PlacementType.NORTH_WALL,
 				"destroy_to_complete": false,
 			},
@@ -570,7 +570,7 @@ var object_spawn_policies = [
 			},
 			{
 				"type": wall_torch,
-				"count": func(level_manager, room): return 2,
+				"count": func(level_manager, room): return 1000000,
 				"placement": PlacementType.NORTH_WALL,
 				"destroy_to_complete": false,
 			},

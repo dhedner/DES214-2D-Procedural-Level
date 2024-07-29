@@ -21,6 +21,8 @@ var room_rect : Rect2i
 var room_safe_rect : Rect2i
 var room_safe_2_rect : Rect2i
 var room_walls_rect : Rect2i
+var corner_rect = Rect2i()
+var debug_corner_rect = Rect2()
 var used_floor_tile_positions = {}
 var floor_tile_positions = []
 var corridor_tile_positions = []
@@ -31,8 +33,6 @@ var pickups_for_completion = []
 var room_type = RoomType.UNKNOWN
 @onready var tilemap : TileMap = get_tree().get_root().get_node("Main/TileMap")
 
-var corner_rect = Rect2i()
-var debug_corner_rect = Rect2()
 var room_colors = {
 	RoomType.START: Color(0, 1, 0, 0.3), # Green
 	RoomType.END: Color(1, 0, 0, 0.3), # Red
