@@ -16,9 +16,12 @@ var is_cramped = false
 var room_size_in_tiles : Vector2i
 var room_position_in_tiles : Vector2i
 var room_top_left : Vector2i
+var room_rect : Rect2i
+var room_safe_rect : Rect2i
 var used_floor_tile_positions = {}
 var floor_tile_positions = []
 var corridor_tile_positions = []
+var door_tile_positions = []
 var corridors = []
 var objects_for_completion = []
 var room_type
@@ -122,8 +125,7 @@ func add_floor_tiles(tile_positions, is_corridor):
 	tilemap.set_cells_terrain_connect(1, tile_positions, 0, -1)
 	
 	# Floor overlay (such as grates)
-	if not is_corridor:
-		tilemap.set_cells_terrain_connect(2, tile_positions, 0, 2)
+	tilemap.set_cells_terrain_connect(2, tile_positions, 0, 2)
 
 func pass_1(level_manager):
 	# Compute the room type
@@ -150,6 +152,8 @@ func pass_1(level_manager):
 	room_size_in_tiles = Vector2i(room_size_in_tiles_float.x, room_size_in_tiles_float.y)
 	room_position_in_tiles = tilemap.local_to_map(position)
 	room_top_left = room_position_in_tiles - room_size_in_tiles / 2
+	room_rect = Rect2i(room_top_left, room_size_in_tiles)
+	room_safe_rect = Rect2i(room_top_left + Vector2i(1, 1), room_size_in_tiles - Vector2i(2, 2))
 
 	make_l_shaped(level_manager)
 	compute_floor_tiles()
@@ -169,8 +173,14 @@ func add_corridor_tiles(corridor_tiles):
 
 	# Add corridor tiles to corridor_tile_positions if they are part of the floor
 	for tile_position in corridor_tiles:
-		if floor_tile_positions.find(tile_position) != -1:
-			corridor_tile_positions.append(tile_position)
+		if floor_tile_positions.find(tile_position) == -1:
+			continue
+		
+		corridor_tile_positions.append(tile_position)
+
+		# Get the "door" tiles that are in the room rect but not in the safe room rect
+		if room_rect.has_point(tile_position) and !room_safe_rect.has_point(tile_position):
+			door_tile_positions.append(tile_position)
 
 func make_l_shaped(level_manager):
 	# Check if this room should be L-shaped
@@ -206,7 +216,7 @@ func get_local_from_tileset(tile_position):
 func get_tiles_for_placement(placement_type, placement_count, blocks_tiles):
 	# Copy & filter out the used positions
 	var tile_positions = floor_tile_positions.filter(
-		func (tile_position): return !used_floor_tile_positions.has(tile_position))
+		func (tile_position): return !used_floor_tile_positions.has(tile_position) and room_safe_rect.has_point(tile_position))
 
 	match placement_type:
 		PlacementType.RANDOM:
@@ -214,6 +224,9 @@ func get_tiles_for_placement(placement_type, placement_count, blocks_tiles):
 			tile_positions.shuffle()
 
 		PlacementType.FLOOR:
+			pass
+
+		PlacementType.NORTH_WALL:
 			pass
 
 		PlacementType.ALL_FLOOR_GRID_3X3_SPACING:
