@@ -19,6 +19,7 @@ var room_position_in_tiles : Vector2i
 var room_top_left : Vector2i
 var room_rect : Rect2i
 var room_safe_rect : Rect2i
+var room_safe_2_rect : Rect2i
 var room_walls_rect : Rect2i
 var used_floor_tile_positions = {}
 var floor_tile_positions = []
@@ -58,6 +59,12 @@ func _draw():
 	draw_rect(Rect2(
 		get_local_from_tileset(room_safe_rect.position),
 		room_safe_rect.size * tilemap.tile_set.tile_size),
+		Color(1, 1, 1, 0.2))
+
+	# Draw the room safe 2 rectangle
+	draw_rect(Rect2(
+		get_local_from_tileset(room_safe_2_rect.position),
+		room_safe_2_rect.size * tilemap.tile_set.tile_size),
 		Color(1, 1, 1, 0.2))
 	
 	# Draw corner rect
@@ -200,6 +207,7 @@ func pass_1(level_manager):
 	room_top_left = room_position_in_tiles - room_size_in_tiles / 2
 	room_rect = Rect2i(room_top_left, room_size_in_tiles)
 	room_safe_rect = Rect2i(room_top_left + Vector2i(1, 1), room_size_in_tiles - Vector2i(2, 2))
+	room_safe_2_rect = Rect2i(room_top_left + Vector2i(2, 2), room_size_in_tiles - Vector2i(4, 4))
 	room_walls_rect = Rect2i(room_top_left - Vector2i(1, 1), room_size_in_tiles + Vector2i(2, 2))
 
 	make_l_shaped(level_manager)
@@ -264,7 +272,7 @@ func get_local_from_tileset(tile_position):
 func get_tiles_for_placement(placement_type, placement_count, blocks_tiles):
 	# Copy & filter out the used positions
 	var tile_positions = floor_tile_positions.filter(
-		func (tile_position): return !used_floor_tile_positions.has(tile_position) and room_safe_rect.has_point(tile_position))
+		func (tile_position): return !used_floor_tile_positions.has(tile_position) and room_safe_2_rect.has_point(tile_position))
 
 	match placement_type:
 		PlacementType.RANDOM:
