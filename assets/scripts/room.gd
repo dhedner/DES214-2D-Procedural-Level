@@ -86,14 +86,21 @@ func spawn_with_policy(level_manager, objects_to_spawn):
 			true)
 
 		for tile_position in tile_positions:
-			var object_instance = object_descriptor["type"].instantiate()
-			add_child(object_instance)
-			object_instance.position = get_local_from_tileset(tile_position)
+			var types_to_spawn = []
+			if object_descriptor["type"] is Callable:
+				types_to_spawn = object_descriptor["type"].call(level_manager, self)
+			else:
+				types_to_spawn.append(object_descriptor["type"])
 
-			if object_descriptor["destroy_to_complete"]:
-				objects_for_completion.append(object_instance)
+			for type_to_spawn in types_to_spawn:
+				var object_instance = type_to_spawn.instantiate()
+				add_child(object_instance)
+				object_instance.position = get_local_from_tileset(tile_position)
 
-			print("Spawning ", object_descriptor["type"], " at ", object_instance.position)
+				if object_descriptor["destroy_to_complete"]:
+					objects_for_completion.append(object_instance)
+
+				print("Spawning ", object_descriptor["type"], " at ", object_instance.position)
 
 func add_terrain_with_policy(level_manager, terrain_to_spawn):
 	for terrain_descriptor in terrain_to_spawn:
