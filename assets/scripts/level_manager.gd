@@ -5,7 +5,7 @@ var corridor = preload("res://assets/scenes/corridor.tscn")
 
 @export var tile_size = 32
 @export var num_rooms = 20
-@export var min_size = 7
+@export var min_size = 10
 @export var max_size = 15
 @export var x_bias = 100
 @export var y_bias = 200
@@ -340,7 +340,7 @@ func generate_diverse_rooms():
 	for i in range(arena_rooms_count):
 		var room_position = Vector2(randf_range(-x_bias, x_bias), randf_range(-y_bias, y_bias))
 		var current_room = room_scene.instantiate()
-		var room_size = Vector2(max_size + 2 + randi() % 3, max_size + 2 + randi() % 3)
+		var room_size = Vector2(max_size + 4 + randi() % 3, max_size + 4 + randi() % 3)
 		current_room.make_room(room_position, room_size * tile_size)
 		current_room.is_arena = true
 		$Rooms.add_child(current_room)

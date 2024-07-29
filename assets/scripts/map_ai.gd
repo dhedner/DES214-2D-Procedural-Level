@@ -87,7 +87,7 @@ var enemy_spawn_policies = [
 	{
 		"rule_name": "easy_standard_room_enemy_group_type_1",
 		"condition": func(level_manager, room): 
-			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.33 and randf() < 0.5,
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.33 and randf() < 0.4,
 		"continue_evaluating": false,
 		"spawn_enemies": [
 			{
@@ -101,9 +101,9 @@ var enemy_spawn_policies = [
 		"on_room_complete_callback": func(room): pass,
 	},
 	{
-		"rule_name": "easy_standard_room_type_2",
+		"rule_name": "easy_standard_room_enemy_group_type_2",
 		"condition": func(level_manager, room): 
-			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.33 and randf() < 0.5,
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.33 and randf() < 0.3,
 		"continue_evaluating": false,
 		"spawn_enemies": [
 			{
@@ -116,22 +116,479 @@ var enemy_spawn_policies = [
 		"spawn_on_room_complete": [],
 		"on_room_complete_callback": func(room): pass,
 	},
-	# {
-	# 	"rule_name": "medium_standard_room fallback",
-	# 	"condition": func(level_manager, room): return room.room_type.ON_MAIN_PATH or room.room_type.OFF_MAIN_PATH and room.distance_score < 0.33,
-	# 	"continue_evaluating": false,
-	# 	"spawn_enemies": [
-	# 		{
-	# 			"type": enemy_turret,
-	# 			"count": func(level_manager, room): return 1,
-	# 			"placement": PlacementType.CENTER,
-	# 			"destroy_to_complete": true,
-	# 		}
-	# 	],
-	# }
+	{
+		"rule_name": "medium_standard_room_enemy_group_type_1",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.66 and room.distance_score > 0.33 and randf() < 0.3,
+		"continue_evaluating": false,
+		"spawn_enemies": [
+			{
+				"type": enemy_shooter,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": true,
+			},
+			{
+				"type": enemy_fighter,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "medium_standard_room_enemy_group_type_2",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.66 and room.distance_score > 0.33 and randf() < 0.3,
+		"continue_evaluating": false,
+		"spawn_enemies": [
+			{
+				"type": enemy_turret,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"destroy_to_complete": true,
+			},
+			{
+				"type": enemy_tank,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.CENTER,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "medium_standard_room_enemy_group_type_3",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.66 and room.distance_score > 0.33 and randf() < 0.3,
+		"continue_evaluating": false,
+		"spawn_enemies": [
+			{
+				"type": enemy_turret,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"destroy_to_complete": true,
+			},
+			{
+				"type": enemy_fighter,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.CENTER,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "medium_standard_room_enemy_group_type_4",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.66 and room.distance_score > 0.33,
+		"continue_evaluating": false,
+		"spawn_enemies": [
+			{
+				"type": enemy_shooter,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "hard_standard_room_enemy_group_type_1",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score > 0.66 and randf() < 0.3,
+		"continue_evaluating": false,
+		"spawn_enemies": [
+			{
+				"type": enemy_shooter,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": true,
+			},
+			{
+				"type": enemy_fighter,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "hard_standard_room_enemy_group_type_2",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score > 0.66 and randf() < 0.3,
+		"continue_evaluating": false,
+		"spawn_enemies": [
+			{
+				"type": enemy_shooter,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.CENTER,
+				"destroy_to_complete": true,
+			},
+			{
+				"type": enemy_tank,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "hard_standard_room_enemy_group_type_3",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score > 0.66 and randf() < 0.3,
+		"continue_evaluating": false,
+		"spawn_enemies": [
+			{
+				"type": enemy_shooter,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"destroy_to_complete": true,
+			},
+			{
+				"type": enemy_fighter,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": true,
+			},
+			{
+				"type": enemy_tank,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "hard_standard_room_enemy_group_type_4",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score > 0.66,
+		"continue_evaluating": false,
+		"spawn_enemies": [
+			{
+				"type": enemy_shooter,
+				"count": func(level_manager, room): return 3,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "easy_arena_room_enemy_group_type_1",
+		"condition": func(level_manager, room): 
+			return room.is_arena and room.distance_score < 0.33 and randf() < 0.5,
+		"continue_evaluating": true,
+		"spawn_enemies": [
+			{
+				"type": enemy_shooter,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.CENTER,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "easy_arena_room_enemy_group_type_2",
+		"condition": func(level_manager, room): 
+			return room.is_arena and room.distance_score < 0.33,
+		"continue_evaluating": false,
+		"spawn_enemies": [
+			{
+				"type": enemy_turret,
+				"count": func(level_manager, room): return 3,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [
+			{
+				"type": heart_container,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.CENTER,
+			}
+		],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "medium_arena_room_enemy_group_type_1",
+		"condition": func(level_manager, room): 
+			return room.is_arena and room.distance_score < 0.66 and room.distance_score > 0.33 and randf() < 0.3,
+		"continue_evaluating": true,
+		"spawn_enemies": [
+			{
+				"type": enemy_tank,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": true,
+			},
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "medium_arena_room_enemy_group_type_2",
+		"condition": func(level_manager, room): 
+			return room.is_arena and room.distance_score < 0.66 and room.distance_score > 0.33 and randf() < 0.7,
+		"continue_evaluating": true,
+		"spawn_enemies": [
+			{
+				"type": enemy_fighter,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "medium_arena_room_enemy_group_type_3",
+		"condition": func(level_manager, room): 
+			return room.is_arena and room.distance_score < 0.66 and room.distance_score > 0.33,
+		"continue_evaluating": true,
+		"spawn_enemies": [
+			{
+				"type": enemy_turret,
+				"count": func(level_manager, room): return 3,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [
+			{
+				"type": heart_container,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.CENTER,
+			}
+		],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "hard_arena_room_enemy_group_type_1",
+		"condition": func(level_manager, room): 
+			return room.is_arena and room.distance_score > 0.66 and randf() < 0.5,
+		"continue_evaluating": true,
+		"spawn_enemies": [
+			{
+				"type": enemy_tank,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": true,
+			},
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "hard_arena_room_enemy_group_type_2",
+		"condition": func(level_manager, room): 
+			return room.is_arena and room.distance_score > 0.66 and randf() < 0.7,
+		"continue_evaluating": true,
+		"spawn_enemies": [
+			{
+				"type": enemy_shooter,
+				"count": func(level_manager, room): return 3,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "hard_arena_room_enemy_group_type_3",
+		"condition": func(level_manager, room): 
+			return room.is_arena and room.distance_score > 0.66,
+		"continue_evaluating": true,
+		"spawn_enemies": [
+			{
+				"type": enemy_turret,
+				"count": func(level_manager, room): return 3,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"destroy_to_complete": true,
+			}
+		],
+		"spawn_on_room_complete": [
+			{
+				"type": heart_container,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.CENTER,
+			}
+		],
+		"on_room_complete_callback": func(room): pass,
+	},
 ]
 
 var object_spawn_policies = [
+	{
+		"rule_name": "easy_standard_room_object_group_type_1",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.33 and randf() < 0.5,
+		"continue_evaluating": true,
+		"spawn_objects": [
+			{
+				"type": wall_torch,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.NORTH_WALL,
+				"destroy_to_complete": false,
+			},
+			{
+				"type": crate,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": false,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "easy_standard_room_object_group_type_2",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.33 and randf() < 0.5,
+		"continue_evaluating": false,
+		"spawn_objects": [
+			{
+				"type": ground_torch,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"destroy_to_complete": false,
+			},
+			{
+				"type": crate,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": false,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "medium_standard_room_object_group_type_1",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.66 and room.distance_score > 0.33 and randf() < 0.4,
+		"continue_evaluating": true,
+		"spawn_objects": [
+			{
+				"type": wall_torch,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.NORTH_WALL,
+				"destroy_to_complete": false,
+			},
+			{
+				"type": crate,
+				"count": func(level_manager, room): return 3,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": false,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "medium_standard_room_object_group_type_2",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.66 and room.distance_score > 0.33 and randf() < 0.4,
+		"continue_evaluating": true,
+		"spawn_objects": [
+			{
+				"type": ground_torch,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.NORTH_WALL,
+				"destroy_to_complete": false,
+			},
+			{
+				"type": crate,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": false,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "hard_standard_room_object_group_type_1",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score > 0.66 and randf() < 0.4,
+		"continue_evaluating": true,
+		"spawn_objects": [
+			{
+				"type": wall_torch,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.NORTH_WALL,
+				"destroy_to_complete": false,
+			},
+			{
+				"type": crate,
+				"count": func(level_manager, room): return 3,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": false,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "hard_standard_room_object_group_type_2",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score > 0.66 and randf() < 0.4,
+		"continue_evaluating": true,
+		"spawn_objects": [
+			{
+				"type": ground_torch,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.NORTH_WALL,
+				"destroy_to_complete": false,
+			},
+			{
+				"type": crate,
+				"count": func(level_manager, room): return 3,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": false,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
+	{
+		"rule_name": "hard_standard_room_object_group_type_3",
+		"condition": func(level_manager, room): 
+			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score > 0.66 and randf() < 0.4,
+		"continue_evaluating": true,
+		"spawn_objects": [
+			{
+				"type": ground_torch,
+				"count": func(level_manager, room): return 3,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"destroy_to_complete": false,
+			},
+			{
+				"type": crate,
+				"count": func(level_manager, room): return 1,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": false,
+			}
+		],
+		"spawn_on_room_complete": [],
+		"on_room_complete_callback": func(room): pass,
+	},
 ]
 
 func spawn_room_objects(level_manager, room_container):
@@ -144,7 +601,7 @@ func spawn_room_objects(level_manager, room_container):
 			if not policy["condition"].call(level_manager, room):
 				continue
 
-			print("terrain rule=", policy["rule_name"], " applies to ", room)
+			# print("terrain rule=", policy["rule_name"], " applies to ", room)
 
 			room.add_terrain_with_policy(level_manager, policy["spawn_terrain"])
 
@@ -155,7 +612,7 @@ func spawn_room_objects(level_manager, room_container):
 			if not policy["condition"].call(level_manager, room):
 				continue
 
-			print("spawn rule=", policy["rule_name"], " applies to ", room)
+			# print("spawn rule=", policy["rule_name"], " applies to ", room)
 
 			room.spawn_with_policy(level_manager, policy["spawn_enemies"])
 			room.add_cleared_pickup(level_manager, policy["spawn_on_room_complete"], policy["on_room_complete_callback"])
@@ -167,7 +624,7 @@ func spawn_room_objects(level_manager, room_container):
 			if not policy["condition"].call(level_manager, room):
 				continue
 
-			print("spawn rule=", policy["rule_name"], " applies to ", room)
+			# print("spawn rule=", policy["rule_name"], " applies to ", room)
 
 			room.spawn_with_policy(level_manager, policy["spawn_objects"])
 			room.add_cleared_pickup(level_manager, policy["spawn_on_room_complete"], policy["on_room_complete_callback"])
