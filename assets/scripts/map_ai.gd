@@ -22,6 +22,11 @@ var swift_boots = preload("res://assets/scenes/swift_boots.tscn")
 
 # Temporary tracking for objects like keys
 var used_key_count = 0
+var treasures = [
+	firerate_pickup,
+	swift_boots,
+	key
+]
 
 var terrain_spawn_policies = [
 	{
@@ -589,6 +594,22 @@ var object_spawn_policies = [
 		"spawn_on_room_complete": [],
 		"on_room_complete_callback": func(room): pass,
 	},
+	# {
+	# 	"rule_name": "treasure_room",
+	# 	"condition": func(level_manager, room): 
+	# 		return len(treasures) > 0 and room.room_type == RoomType.TREASURE,
+	# 	"continue_evaluating": true,
+	# 	"spawn_objects": [
+	# 		{
+	# 			"type": func(level_manager, room): return treasures.pop_front(),
+	# 			"count": func(level_manager, room): return 3,
+	# 			"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+	# 			"destroy_to_complete": false,
+	# 		},
+	# 	],
+	# 	"spawn_on_room_complete": [],
+	# 	"on_room_complete_callback": func(room): pass,
+	# },
 ]
 
 func spawn_room_objects(level_manager, room_container):

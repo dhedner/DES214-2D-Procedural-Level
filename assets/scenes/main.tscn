@@ -1,6 +1,7 @@
-[gd_scene load_steps=21 format=3 uid="uid://cvetfippmsxli"]
+[gd_scene load_steps=22 format=3 uid="uid://cvetfippmsxli"]
 
 [ext_resource type="Script" path="res://assets/scripts/main.gd" id="1_3sh7e"]
+[ext_resource type="FontFile" uid="uid://6vosinleacei" path="res://assets/fonts/LiberationSans.ttf" id="2_fh75r"]
 [ext_resource type="PackedScene" uid="uid://jl64cwk2yjse" path="res://assets/scenes/level.tscn" id="2_pwn6v"]
 [ext_resource type="Texture2D" uid="uid://dxxf55g65fsyt" path="res://assets/sprites/FG_Cellar.png" id="3_4o63x"]
 [ext_resource type="Script" path="res://assets/scripts/pathfinding.gd" id="3_5b60q"]
@@ -3076,6 +3077,48 @@ func _process(delta):
 [node name="Main" type="Node2D"]
 script = ExtResource("1_3sh7e")
 
+[node name="Loading" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Loading"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="Bars" type="VBoxContainer" parent="Loading/MarginContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="TopRow" type="HBoxContainer" parent="Loading/MarginContainer/Bars"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MiddleRow" type="HBoxContainer" parent="Loading/MarginContainer/Bars"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 4.0
+alignment = 1
+
+[node name="KeyCount" type="Label" parent="Loading/MarginContainer/Bars/MiddleRow"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_fh75r")
+theme_override_font_sizes/font_size = 48
+text = "LOADING..."
+vertical_alignment = 1
+
+[node name="BottomRow" type="HBoxContainer" parent="Loading/MarginContainer/Bars"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.75
+
 [node name="Camera2D" type="Camera2D" parent="."]
 z_index = 1
 zoom = Vector2(0.2, 0.2)
@@ -3111,3 +3154,4 @@ script = ExtResource("3_5b60q")
 script = SubResource("GDScript_cfymv")
 
 [node name="GUI" parent="." instance=ExtResource("6_kp3m4")]
+visible = false

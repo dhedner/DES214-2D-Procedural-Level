@@ -8,6 +8,7 @@ var level_exit = preload("res://assets/scenes/level_exit.tscn")
 @onready var tilemap = $TileMap
 @onready var pathfinding = $Pathfinding
 @onready var gui = $GUI
+@onready var loading = $Loading
 
 @onready var room_container = $Level/Rooms
 @onready var corridor_container = $Level/Corridors
@@ -25,6 +26,10 @@ func _ready():
 
 	spawn_player()
 	map_ai.spawn_room_objects(level_manager, room_container)
+
+	# enable the gui
+	gui.visible = true
+	loading.visible = false
 
 func _draw():
 	queue_redraw()

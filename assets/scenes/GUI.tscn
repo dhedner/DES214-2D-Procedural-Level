@@ -59,6 +59,7 @@ size_flags_stretch_ratio = 4.0
 [node name="BottomRow" type="HBoxContainer" parent="MarginContainer/Bars"]
 layout_mode = 2
 size_flags_vertical = 3
+size_flags_stretch_ratio = 0.75
 
 [node name="KeyIcon" type="TextureRect" parent="MarginContainer/Bars/BottomRow"]
 layout_mode = 2

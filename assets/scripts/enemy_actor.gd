@@ -7,7 +7,6 @@ signal enemy_died()
 
 func handle_hit(damage):
 	health_stat.health -= damage
-	print("Enemy health: ", health_stat.health)
 	emit_signal("enemy_health_changed", health_stat.health)
 	if health_stat.health <= 0:
 		emit_signal("enemy_died")
