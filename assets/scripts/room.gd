@@ -216,6 +216,13 @@ func get_tiles_for_placement(placement_type, placement_count, blocks_tiles):
 		PlacementType.FLOOR:
 			pass
 
+		PlacementType.ALL_FLOOR_GRID_3X3_SPACING:
+			# Filter out the positions that are not in a 3x3 grid
+			tile_positions = tile_positions.filter(
+				func (tile_position): 
+					var offset = tile_position - room_top_left
+					return offset.x % 3 == 0 and offset.y % 3 == 0)
+
 		PlacementType.CENTER:
 			# Find the positions in floor_tile_positions that are closest to the center
 			var center = room_position_in_tiles
