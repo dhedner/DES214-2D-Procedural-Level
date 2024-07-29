@@ -8,10 +8,10 @@
 [ext_resource type="Script" path="res://assets/scripts/enemy_fighterAI.gd" id="5_df1us"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6ij63"]
-radius = 20.0
+radius = 15.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5tg4p"]
-radius = 160.0
+radius = 130.0
 
 [sub_resource type="Gradient" id="Gradient_w77e6"]
 offsets = PackedFloat32Array(0.46729, 0.544393, 0.661215)
@@ -28,6 +28,7 @@ item_drop_rate = 0.4
 
 [node name="Sprite2D" parent="CharacterBody2D" index="0"]
 rotation = 1.5708
+scale = Vector2(0.5, 0.5)
 texture = ExtResource("2_pp5m8")
 
 [node name="CollisionShape2D" parent="CharacterBody2D" index="1"]

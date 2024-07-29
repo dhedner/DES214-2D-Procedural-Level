@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://74vr2cl3os72"]
+
+[ext_resource type="PackedScene" uid="uid://d2v02qociburp" path="res://assets/scenes/spike.tscn" id="1_qrhf6"]
+
+[node name="GridContainer" type="GridContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+columns = 2
+
+[node name="Area2D" parent="." instance=ExtResource("1_qrhf6")]
+
+[node name="Area2D2" parent="." instance=ExtResource("1_qrhf6")]
+position = Vector2(36, 0)
+
+[node name="Area2D3" parent="." instance=ExtResource("1_qrhf6")]
+position = Vector2(0, 32)
+
+[node name="Area2D4" parent="." instance=ExtResource("1_qrhf6")]
+position = Vector2(36, 32)

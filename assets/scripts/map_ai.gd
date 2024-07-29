@@ -9,7 +9,8 @@ var boss = preload("res://assets/scenes/enemy_boss.tscn")
 var crate = preload("res://assets/scenes/crate.tscn")
 var wall_torch = preload("res://assets/scenes/wall_torch.tscn")
 var ground_torch = preload("res://assets/scenes/ground_torch.tscn")
-var spikes = preload("res://assets/scenes/spikes.tscn")
+var spike = preload("res://assets/scenes/spike.tscn")
+var spike_group = preload("res://assets/scenes/spike_group.tscn")
 var key = preload("res://assets/scenes/key.tscn")
 var health_pickup = preload("res://assets/scenes/health_pickup.tscn")
 var locked_door = preload("res://assets/scenes/door.tscn")
@@ -114,7 +115,7 @@ var enemy_spawn_policies = [
 			{
 				"type": enemy_turret,
 				"count": func(level_manager, room): return 2,
-				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": true,
 			},
 		],
@@ -152,7 +153,7 @@ var enemy_spawn_policies = [
 			{
 				"type": enemy_turret,
 				"count": func(level_manager, room): return 2,
-				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": true,
 			},
 			{
@@ -174,7 +175,7 @@ var enemy_spawn_policies = [
 			{
 				"type": enemy_turret,
 				"count": func(level_manager, room): return 1,
-				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": true,
 			},
 			{
@@ -196,7 +197,7 @@ var enemy_spawn_policies = [
 			{
 				"type": enemy_shooter,
 				"count": func(level_manager, room): return 2,
-				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": true,
 			}
 		],
@@ -256,7 +257,7 @@ var enemy_spawn_policies = [
 			{
 				"type": enemy_shooter,
 				"count": func(level_manager, room): return 2,
-				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": true,
 			},
 			{
@@ -284,7 +285,7 @@ var enemy_spawn_policies = [
 			{
 				"type": enemy_shooter,
 				"count": func(level_manager, room): return 3,
-				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": true,
 			}
 		],
@@ -315,8 +316,8 @@ var enemy_spawn_policies = [
 		"spawn_enemies": [
 			{
 				"type": enemy_turret,
-				"count": func(level_manager, room): return 3,
-				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"count": func(level_manager, room): return 4,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": true,
 			}
 		],
@@ -369,8 +370,8 @@ var enemy_spawn_policies = [
 		"spawn_enemies": [
 			{
 				"type": enemy_turret,
-				"count": func(level_manager, room): return 3,
-				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"count": func(level_manager, room): return 4,
+				"placement": PlacementType.ALL_FLOOR_GRID_4X4_SPACING,
 				"destroy_to_complete": true,
 			}
 		],
@@ -423,8 +424,8 @@ var enemy_spawn_policies = [
 		"spawn_enemies": [
 			{
 				"type": enemy_turret,
-				"count": func(level_manager, room): return 3,
-				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"count": func(level_manager, room): return 4,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": true,
 			}
 		],
@@ -471,7 +472,7 @@ var object_spawn_policies = [
 			{
 				"type": ground_torch,
 				"count": func(level_manager, room): return 1,
-				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": false,
 			},
 			{
@@ -488,8 +489,14 @@ var object_spawn_policies = [
 		"rule_name": "medium_standard_room_object_group_type_1",
 		"condition": func(level_manager, room): 
 			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.66 and room.distance_score > 0.33 and randf() < 0.4,
-		"continue_evaluating": true,
+		"continue_evaluating": false,
 		"spawn_objects": [
+			{
+				"type": spike,
+				"count": func(level_manager, room): return 4,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": false,
+			},
 			{
 				"type": wall_torch,
 				"count": func(level_manager, room): return 2,
@@ -510,20 +517,26 @@ var object_spawn_policies = [
 		"rule_name": "medium_standard_room_object_group_type_2",
 		"condition": func(level_manager, room): 
 			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score < 0.66 and room.distance_score > 0.33 and randf() < 0.4,
-		"continue_evaluating": true,
+		"continue_evaluating": false,
 		"spawn_objects": [
 			{
-				"type": ground_torch,
-				"count": func(level_manager, room): return 2,
-				"placement": PlacementType.NORTH_WALL,
+				"type": spike_group,
+				"count": func(level_manager, room): return 4,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": false,
 			},
 			{
-				"type": crate,
-				"count": func(level_manager, room): return 1,
+				"type": spike,
+				"count": func(level_manager, room): return 2,
 				"placement": PlacementType.RANDOM,
 				"destroy_to_complete": false,
-			}
+			},
+			{
+				"type": ground_torch,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": false,
+			},
 		],
 		"spawn_on_room_complete": [],
 		"on_room_complete_callback": func(room): pass,
@@ -532,8 +545,20 @@ var object_spawn_policies = [
 		"rule_name": "hard_standard_room_object_group_type_1",
 		"condition": func(level_manager, room): 
 			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score > 0.66 and randf() < 0.4,
-		"continue_evaluating": true,
+		"continue_evaluating": false,
 		"spawn_objects": [
+			{
+				"type": spike_group,
+				"count": func(level_manager, room): return 4,
+				"placement": PlacementType.ALL_FLOOR_GRID_4X4_SPACING,
+				"destroy_to_complete": false,
+			},
+			{
+				"type": spike,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.RANDOM,
+				"destroy_to_complete": false,
+			},
 			{
 				"type": wall_torch,
 				"count": func(level_manager, room): return 2,
@@ -554,20 +579,20 @@ var object_spawn_policies = [
 		"rule_name": "hard_standard_room_object_group_type_2",
 		"condition": func(level_manager, room): 
 			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score > 0.66 and randf() < 0.4,
-		"continue_evaluating": true,
+		"continue_evaluating": false,
 		"spawn_objects": [
 			{
-				"type": ground_torch,
-				"count": func(level_manager, room): return 2,
-				"placement": PlacementType.NORTH_WALL,
+				"type": spike_group,
+				"count": func(level_manager, room): return 6,
+				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
 				"destroy_to_complete": false,
 			},
 			{
-				"type": crate,
-				"count": func(level_manager, room): return 3,
-				"placement": PlacementType.RANDOM,
+				"type": ground_torch,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": false,
-			}
+			},
 		],
 		"spawn_on_room_complete": [],
 		"on_room_complete_callback": func(room): pass,
@@ -576,20 +601,14 @@ var object_spawn_policies = [
 		"rule_name": "hard_standard_room_object_group_type_3",
 		"condition": func(level_manager, room): 
 			return (room.room_type == RoomType.ON_MAIN_PATH or room.room_type == RoomType.OFF_MAIN_PATH) and room.distance_score > 0.66 and randf() < 0.4,
-		"continue_evaluating": true,
+		"continue_evaluating": false,
 		"spawn_objects": [
 			{
 				"type": ground_torch,
-				"count": func(level_manager, room): return 3,
-				"placement": PlacementType.ALL_FLOOR_GRID_3X3_SPACING,
+				"count": func(level_manager, room): return 2,
+				"placement": PlacementType.GRID_2X2_CENTERED,
 				"destroy_to_complete": false,
 			},
-			{
-				"type": crate,
-				"count": func(level_manager, room): return 1,
-				"placement": PlacementType.RANDOM,
-				"destroy_to_complete": false,
-			}
 		],
 		"spawn_on_room_complete": [],
 		"on_room_complete_callback": func(room): pass,

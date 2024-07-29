@@ -8,10 +8,10 @@
 [ext_resource type="Script" path="res://assets/scripts/enemy_tankAI.gd" id="5_3vl0s"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_f687q"]
-radius = 30.0
+radius = 20.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5tg4p"]
-radius = 200.0
+radius = 150.0
 
 [sub_resource type="Gradient" id="Gradient_qdg6s"]
 offsets = PackedFloat32Array(0.46729, 0.544393, 0.661215)
@@ -28,7 +28,6 @@ item_drop_rate = 0.2
 
 [node name="Sprite2D" parent="CharacterBody2D" index="0"]
 rotation = 1.5708
-scale = Vector2(1, 1)
 texture = ExtResource("2_nag0k")
 
 [node name="CollisionShape2D" parent="CharacterBody2D" index="1"]

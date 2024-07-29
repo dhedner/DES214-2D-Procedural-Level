@@ -1,10 +1,13 @@
-[gd_scene load_steps=9 format=3 uid="uid://cahyb42t68n2x"]
+[gd_scene load_steps=10 format=3 uid="uid://cahyb42t68n2x"]
 
 [ext_resource type="PackedScene" uid="uid://6biqldqluklg" path="res://assets/scenes/enemy.tscn" id="1_a45rv"]
 [ext_resource type="PackedScene" uid="uid://csneqj2ujdwhm" path="res://assets/scenes/health_pickup.tscn" id="2_skd7x"]
 [ext_resource type="PackedScene" uid="uid://cierws6fcdu0c" path="res://assets/scenes/weapon.tscn" id="3_ix23b"]
 [ext_resource type="Script" path="res://assets/scripts/bulletmanager.gd" id="4_1bc3l"]
 [ext_resource type="Script" path="res://assets/scripts/enemy_turretAI.gd" id="5_i3s6b"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hm5tr"]
+radius = 18.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5tg4p"]
 radius = 160.0
@@ -24,6 +27,10 @@ item_drop_rate = 0.7
 
 [node name="Sprite2D" parent="CharacterBody2D" index="0"]
 rotation = 1.5708
+scale = Vector2(0.5, 0.5)
+
+[node name="CollisionShape2D" parent="CharacterBody2D" index="1"]
+shape = SubResource("CircleShape2D_hm5tr")
 
 [node name="Weapon" parent="CharacterBody2D" index="2" instance=ExtResource("3_ix23b")]
 position = Vector2(33, 0)
