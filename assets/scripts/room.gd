@@ -18,6 +18,7 @@ var room_position_in_tiles : Vector2i
 var room_top_left : Vector2i
 var room_rect : Rect2i
 var room_safe_rect : Rect2i
+var room_walls_rect : Rect2i
 var used_floor_tile_positions = {}
 var floor_tile_positions = []
 var corridor_tile_positions = []
@@ -130,7 +131,8 @@ func add_cleared_pickup(level_manager, objects_to_spawn, on_room_complete_callba
 func wait_for_pickups():
 	# Wait for all objects in objects_for_completion to be completed
 	for object_instance in objects_for_completion:
-		await object_instance.completed
+		if object_instance != null:
+			await object_instance.completed
 
 	for pickup_descriptor in pickups_for_completion:
 		var tile_positions = pickup_descriptor["tile_positions"]
@@ -186,6 +188,7 @@ func pass_1(level_manager):
 	room_top_left = room_position_in_tiles - room_size_in_tiles / 2
 	room_rect = Rect2i(room_top_left, room_size_in_tiles)
 	room_safe_rect = Rect2i(room_top_left + Vector2i(1, 1), room_size_in_tiles - Vector2i(2, 2))
+	room_walls_rect = Rect2i(room_top_left - Vector2i(1, 1), room_size_in_tiles + Vector2i(2, 2))
 
 	make_l_shaped(level_manager)
 	compute_floor_tiles()
@@ -260,7 +263,26 @@ func get_tiles_for_placement(placement_type, placement_count, blocks_tiles):
 			pass
 
 		PlacementType.NORTH_WALL:
-			pass
+			tile_positions = []
+
+			# Get all the tiles in the tilemap inside room_walls_rect that have the north wall property
+			for x in range(room_walls_rect.size.x):
+				for y in range(room_walls_rect.size.y):
+					var tile_position = room_walls_rect.position + Vector2i(x, y)
+					# Filter out used
+					if used_floor_tile_positions.has(tile_position):
+						continue
+					
+					var tile_data = tilemap.get_cell_tile_data(1, tile_position)
+					if tile_data:
+						if tile_data.get_custom_data("is_north_wall"):
+							tile_positions.append(tile_position)
+
+			# Stagger every few tiles
+			tile_positions = tile_positions.filter(
+				func (tile_position): 
+					var offset = tile_position - room_top_left
+					return offset.x % 2 == 0)
 
 		PlacementType.DOORS:
 			tile_positions = door_tile_positions.filter(func (tile_position): return !used_floor_tile_positions.has(tile_position))
