@@ -158,7 +158,7 @@ func spawn_room_objects(level_manager, room_container):
 			print("spawn rule=", policy["rule_name"], " applies to ", room)
 
 			room.spawn_with_policy(level_manager, policy["spawn_enemies"])
-			room.set_cleared_pickup(level_manager, policy["spawn_on_room_complete"], policy["on_room_complete_callback"])
+			room.add_cleared_pickup(level_manager, policy["spawn_on_room_complete"], policy["on_room_complete_callback"])
 
 			if not policy["continue_evaluating"]:
 				break
@@ -170,10 +170,13 @@ func spawn_room_objects(level_manager, room_container):
 			print("spawn rule=", policy["rule_name"], " applies to ", room)
 
 			room.spawn_with_policy(level_manager, policy["spawn_objects"])
-			room.set_cleared_pickup(level_manager, policy["spawn_on_room_complete"], policy["on_room_complete_callback"])
+			room.add_cleared_pickup(level_manager, policy["spawn_on_room_complete"], policy["on_room_complete_callback"])
 
 			if not policy["continue_evaluating"]:
 				break
+
+		# notify the room that the pickups have been set
+		room.wait_for_pickups()
 
 # func spawn_enemies(level_manager):
 # 	var eligible_rooms = []

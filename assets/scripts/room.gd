@@ -24,6 +24,7 @@ var corridor_tile_positions = []
 var door_tile_positions = []
 var corridors = []
 var objects_for_completion = []
+var pickups_for_completion = []
 var room_type
 @onready var tilemap : TileMap = get_tree().get_root().get_node("Main/TileMap")
 
@@ -90,13 +91,9 @@ func add_terrain_with_policy(level_manager, terrain_to_spawn):
 
 		print("Spawning terrain=", terrain_descriptor["terrain"], " layer=", terrain_descriptor["layer"], " count=", tile_positions.size())
 
-func set_cleared_pickup(level_manager, objects_to_spawn, on_room_complete_callback):
+func add_cleared_pickup(level_manager, objects_to_spawn, on_room_complete_callback):
 	if len(objects_to_spawn) == 0:
 		return
-
-	# Wait for all objects in objects_for_completion to be completed
-	for object_instance in objects_for_completion:
-		await object_instance.completed
 
 	# Spawn the objects
 	for object_descriptor in objects_to_spawn:
@@ -105,7 +102,24 @@ func set_cleared_pickup(level_manager, objects_to_spawn, on_room_complete_callba
 			object_descriptor["placement"], 
 			object_descriptor["count"].call(level_manager, self),
 			true)
+		
+		pickups_for_completion.append({
+			"tile_positions": tile_positions,
+			"object_descriptor": object_descriptor,
+			"on_room_complete_callback": on_room_complete_callback
+		})
 
+func wait_for_pickups():
+	# Wait for all objects in objects_for_completion to be completed
+	for object_instance in objects_for_completion:
+		await object_instance.completed
+
+	for pickup_descriptor in pickups_for_completion:
+		var tile_positions = pickup_descriptor["tile_positions"]
+		var object_descriptor = pickup_descriptor["object_descriptor"]
+		var on_room_complete_callback = pickup_descriptor["on_room_complete_callback"]
+
+		# Spawn the object
 		for tile_position in tile_positions:
 			var object_instance = object_descriptor["type"].instantiate()
 			add_child(object_instance)
